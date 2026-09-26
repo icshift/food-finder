@@ -1,71 +1,7 @@
 import os
-import urllib.parse
-import urllib.request
-import re
-import html
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, render_template_string
 
 app = Flask(__name__)
-
-# موتور استخراج نتایج واقعی بدون سد قوانین اروپا
-def fetch_real_posts(query):
-    results = []
-    try:
-        # استفاده از داک‌داک‌گو که سرورهای آلمان را مسدود نمی‌کند
-        url = "https://html.duckduckgo.com/html/"
-        data = urllib.parse.urlencode({'q': query}).encode('utf-8')
-        
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                'Accept-Encoding': 'identity',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        )
-        
-        with urllib.request.urlopen(req, timeout=9) as resp:
-            content = resp.read().decode('utf-8', errors='ignore')
-            
-            # تفکیک هر نتیجه در صفحه
-            items = content.split('class="result results_links')
-            for item in items[1:]:
-                # استخراج لینک مستقیم اینستاگرام
-                link_match = re.search(r'uddg=([^&"\']+)', item)
-                if not link_match:
-                    continue
-                clean_url = urllib.parse.unquote(link_match.group(1))
-                
-                if "instagram.com" not in clean_url:
-                    continue
-                    
-                # استخراج عنوان پست
-                title_match = re.search(r'class="result__a"[^>]*>(.*?)</a>', item, re.DOTALL)
-                raw_title = title_match.group(1) if title_match else "معرفی رستوران و غذا"
-                clean_title = re.sub(r'<[^>]+>', '', raw_title)
-                clean_title = html.unescape(clean_title).replace("• Instagram photos and videos", "").replace("on Instagram", "").replace("- Instagram", "").strip()
-                
-                # استخراج آدرس و توضیحات کپشن
-                snippet_match = re.search(r'class="result__snippet"[^>]*>(.*?)</a>', item, re.DOTALL)
-                raw_snippet = snippet_match.group(1) if snippet_match else ""
-                clean_desc = re.sub(r'<[^>]+>', '', raw_snippet)
-                clean_desc = html.unescape(clean_desc).strip()
-                if not clean_desc:
-                    clean_desc = "برای مشاهده قیمت‌ها، منو و آدرس دقیق، دکمه مشاهده را لمس کنید."
-                
-                results.append({
-                    "url": clean_url,
-                    "title": clean_title,
-                    "desc": clean_desc
-                })
-                
-                if len(results) >= 15:
-                    break
-    except Exception as e:
-        print("Scraper error:", e)
-
-    return results
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -73,12 +9,17 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فود یاب | جستجوی دقیق غذا و رستوران</title>
+    <title>فود یاب هوشمند | موتور اختصاصی جستجوی اینستاگرام</title>
+    
+    <!-- اسکریپت رسمی گوگل اختصاصی شما -->
+    <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
+
     <style>
         :root {
+            --primary: #FF5E3A;
             --primary-gradient: linear-gradient(135deg, #FF5E3A 0%, #FF2A54 50%, #C026D3 100%);
             --bg-dark: #0F172A;
-            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-bg: rgba(30, 41, 59, 0.85);
             --card-border: rgba(255, 255, 255, 0.1);
             --text-main: #F8FAFC;
             --text-muted: #94A3B8;
@@ -94,12 +35,13 @@ HTML_TEMPLATE = """
             background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding: 20px 15px 50px 15px;
+            padding: 20px 15px 60px 15px;
             display: flex;
             justify-content: center;
         }
 
         .container { width: 100%; max-width: 680px; }
+
         .header { text-align: center; margin-bottom: 25px; }
         .badge {
             display: inline-block;
@@ -193,30 +135,6 @@ HTML_TEMPLATE = """
         }
         .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
 
-        .time-filter {
-            display: flex;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            gap: 4px;
-        }
-        .time-btn {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: 0.2s;
-        }
-        .time-btn.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-weight: bold;
-        }
-
         .food-input {
             width: 100%;
             background: rgba(15, 23, 42, 0.6);
@@ -241,97 +159,64 @@ HTML_TEMPLATE = """
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(255, 94, 58, 0.35);
-        }
-
-        #loading {
-            display: none;
-            text-align: center;
-            margin: 25px 0;
-            font-weight: bold;
-            color: #FF5E3A;
-            font-size: 15px;
-        }
-
-        .results-header {
-            font-size: 16px;
-            font-weight: bold;
-            margin: 20px 0 15px 0;
-            color: var(--text-main);
-        }
-        .result-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 18px;
-            padding: 18px;
-            margin-bottom: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             transition: 0.2s;
         }
-        .result-card:hover {
-            border-color: rgba(255, 94, 58, 0.4);
+        .search-btn:active { transform: scale(0.98); }
+
+        /* استایل اختصاصی و لوکس برای کادر نتایج گوگل */
+        #resultsWrapper {
+            margin-top: 20px;
+        }
+        .gsc-control-cse {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        .gsc-webResult.gsc-result {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            margin-bottom: 12px !important;
+            transition: 0.2s !important;
+        }
+        .gsc-webResult.gsc-result:hover {
+            border-color: rgba(255, 94, 58, 0.4) !important;
             transform: translateY(-2px);
         }
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .gs-title, .gs-title * {
+            color: #FF5E3A !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            text-decoration: none !important;
         }
-        .card-badge {
-            background: rgba(255, 94, 58, 0.15);
-            color: #FF5E3A;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
+        .gs-snippet {
+            color: var(--text-muted) !important;
+            font-size: 13px !important;
+            line-height: 1.6 !important;
+            margin-top: 8px !important;
         }
-        .post-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: white;
-            line-height: 1.5;
+        .gsc-url-top, .gsc-thumbnail-inside {
+            padding: 0 !important;
         }
-        .post-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.6;
-            background: rgba(0, 0, 0, 0.25);
-            padding: 12px;
-            border-radius: 10px;
-            border-right: 3px solid #FF5E3A;
+        .gs-visibleUrl {
+            color: #10B981 !important;
+            font-size: 12px !important;
         }
-        .card-action {
-            margin-top: 5px;
-            display: flex;
-            justify-content: flex-end;
+        .gsc-cursor-box {
+            margin-top: 20px !important;
+            text-align: center !important;
         }
-        .insta-btn {
-            background: var(--primary-gradient);
-            color: white;
-            text-decoration: none;
-            padding: 9px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .gsc-cursor-page {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            padding: 8px 12px !important;
+            border-radius: 8px !important;
+            margin: 0 4px !important;
         }
-
-        .more-images-box { text-align: center; margin-top: 25px; }
-        .more-images-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--card-border);
-            color: white;
-            text-decoration: none;
-            padding: 14px 20px;
-            border-radius: 14px;
-            display: inline-block;
-            font-size: 14px;
-            font-weight: bold;
+        .gsc-cursor-current-page {
+            background: #FF5E3A !important;
         }
     </style>
 </head>
@@ -339,8 +224,8 @@ HTML_TEMPLATE = """
     <div class="container">
         <div class="header">
             <span class="badge">🔥</span>
-            <h1>فود یاب </h1>
-            <p class="subtitle">یافتن مستقیم غذا و آدرس رستوران‌ها بدون گم شدن در تبلیغات</p>
+            <h1>فود یاب</h1>
+            <p class="subtitle">یافتن مستقیم غذا و آدرس رستوران‌ها در اینستاگرام</p>
         </div>
 
         <div class="search-panel">
@@ -353,28 +238,21 @@ HTML_TEMPLATE = """
             <span class="section-title">🎯 انتخاب فودبلاگرها (چندتایی):</span>
             <div class="pages-list" id="pagesContainer"></div>
 
-            <span class="section-title">📅 بازه زمانی:</span>
-            <div class="time-filter">
-                <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
-                <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
-                <div class="time-btn" id="time-all" onclick="setTime('all')">همه زمان‌ها</div>
-            </div>
-
             <span class="section-title">🍲 نام غذا یا نوشیدنی:</span>
-            <input type="text" class="food-input" id="food" placeholder="مثال: کباب کوبیده، شاورما، پیتزا، پاستا...">
+            <input type="text" class="food-input" id="food" placeholder="مثال: کباب کوبیده، شاورما، پیتزا، پاستا..." onkeypress="handleKeyPress(event)">
 
-            <button class="search-btn" onclick="startSearch()">🔍 دریافت لیست پست‌های اختصاصی</button>
-
-            <div id="loading">✨ در حال استخراج پست‌ها و آدرس‌ها...</div>
+            <button class="search-btn" onclick="executeGoogleSearch()">🔍 جستجوی هوشمند در نتایج زنده</button>
         </div>
 
-        <div id="resultsArea"></div>
+        <!-- محل نمایش نتایج رسمی گوگل داخل خود صفحه -->
+        <div id="resultsWrapper">
+            <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
+        </div>
     </div>
 
     <script>
         let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['شیراز یامی', 'milad_taster'];
         let selectedPages = new Set(['شیراز یامی']);
-        let selectedTime = 'y';
 
         function renderChips() {
             const container = document.getElementById('pagesContainer');
@@ -416,16 +294,14 @@ HTML_TEMPLATE = """
             renderChips();
         }
 
-        function setTime(timeType) {
-            selectedTime = timeType;
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`time-${timeType}`).classList.add('active');
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                executeGoogleSearch();
+            }
         }
 
-        async function startSearch() {
+        function executeGoogleSearch() {
             const food = document.getElementById('food').value.trim();
-            const resultsArea = document.getElementById('resultsArea');
-            const loading = document.getElementById('loading');
 
             if (selectedPages.size === 0) {
                 alert('لطفاً حداقل یک پیج را انتخاب کنید!');
@@ -436,65 +312,23 @@ HTML_TEMPLATE = """
                 return;
             }
 
-            resultsArea.innerHTML = '';
-            loading.style.display = 'block';
-
+            // فرمول‌سازی جستجو
             const pagesArray = Array.from(selectedPages);
-            const queryParams = new URLSearchParams({
-                pages: pagesArray.join(','),
-                food: food,
-                time: selectedTime
-            });
+            let pagesQuery = '';
+            if (pagesArray.length === 1) {
+                pagesQuery = `"${pagesArray[0]}"`;
+            } else {
+                pagesQuery = '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
+            }
 
-            try {
-                const resp = await fetch(`/api/search?${queryParams}`);
-                const data = await resp.json();
-                loading.style.display = 'none';
+            const finalQuery = `${pagesQuery} ${food}`;
 
-                if (!data.results || data.results.length === 0) {
-                    resultsArea.innerHTML = `
-                        <div class="result-card" style="text-align:center;">
-                            <p style="color:var(--text-muted);">پستی با این مشخصات یافت نشد.</p>
-                        </div>
-                    `;
-                } else {
-                    let html = `
-                        <div class="results-header">
-                            <span>🎯 پست‌های پیدا شده (${data.results.length} مورد مستقیم):</span>
-                        </div>
-                    `;
-
-                    data.results.forEach((item, index) => {
-                        html += `
-                            <div class="result-card">
-                                <div class="card-top">
-                                    <span class="card-badge">📌 پست شماره ${index + 1}</span>
-                                </div>
-                                <div class="post-title">${item.title}</div>
-                                <div class="post-desc">📍 <b>آدرس و توضیحات:</b><br>${item.desc}</div>
-                                <div class="card-action">
-                                    <a class="insta-btn" href="${item.url}" target="_blank" rel="noopener noreferrer">
-                                        <span>مشاهده در اینستاگرام</span> ↗
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    resultsArea.innerHTML = html;
-                }
-
-                resultsArea.innerHTML += `
-                    <div class="more-images-box">
-                        <a class="more-images-btn" href="${data.images_url}" target="_blank" rel="noopener noreferrer">
-                            🖼️ دیدن آلبوم عکس‌های تکمیلی در گوگل
-                        </a>
-                    </div>
-                `;
-
-            } catch (err) {
-                loading.style.display = 'none';
-                alert('خطا در دریافت نتایج.');
+            // اجرای مستقیم موتور رسمی گوگل داخل المان صفحه
+            const element = google.search.cse.element.getElement('foodyab_results');
+            if (element) {
+                element.execute(finalQuery);
+            } else {
+                alert('موتور جستجو در حال آماده‌سازی است، لطفاً ۲ ثانیه بعد دوباره دکمه را بزنید.');
             }
         }
 
@@ -507,34 +341,6 @@ HTML_TEMPLATE = """
 @app.route('/')
 def home():
     return render_template_string(HTML_TEMPLATE)
-
-@app.route('/api/search')
-def search_api():
-    pages_param = request.args.get('pages', '')
-    food = request.args.get('food', '')
-    time_filter = request.args.get('time', 'y')
-    
-    pages = [p.strip() for p in pages_param.split(',') if p.strip()]
-    if len(pages) == 1:
-        pages_query = f'"{pages[0]}"'
-    else:
-        pages_query = '(' + ' OR '.join([f'"{p}"' for p in pages]) + ')'
-        
-    query = f'site:instagram.com {pages_query} {food}'
-    
-    # واکشی مستقیم پست‌ها بدون سد امنیتی اروپا
-    results = fetch_real_posts(query)
-    
-    tbs_param = ""
-    if time_filter == 'm':
-        tbs_param = "&tbs=qdr:m"
-    elif time_filter == 'y':
-        tbs_param = "&tbs=qdr:y"
-        
-    encoded_q = urllib.parse.quote(query)
-    images_url = f"https://www.google.com/search?q={encoded_q}&tbm=isch{tbs_param}"
-
-    return jsonify({"results": results, "images_url": images_url})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
