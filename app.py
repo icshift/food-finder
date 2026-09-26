@@ -8,10 +8,10 @@ HTML_TEMPLATE = """
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فود یاب هوشمند | موتور جستجوی خوراک و کافه‌رستوران</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>فود یاب  |  جستجوی خوراک</title>
     
-    <!-- اسکریپت رسمی موتور اختصاصی شما -->
+    <!-- اسکریپت رسمی گوگل اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
 
     <style>
@@ -20,7 +20,7 @@ HTML_TEMPLATE = """
             --primary-gradient: linear-gradient(135deg, #FF6B4A 0%, #FF2A54 50%, #C026D3 100%);
             --accent-warm: #F59E0B;
             --bg-base: #0B0F19;
-            --card-glass: rgba(22, 29, 47, 0.75);
+            --card-glass: rgba(22, 29, 47, 0.85);
             --card-border: rgba(255, 255, 255, 0.12);
             --text-main: #F8FAFC;
             --text-muted: #94A3B8;
@@ -28,15 +28,17 @@ HTML_TEMPLATE = """
 
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
         
-        /* حل مشکل اسکرول: اجازه اسکرول طبیعی و نامحدود در کل صفحه */
+        /* باز کردن کامل و اجباری اسکرول در سطح کل صفحه */
         html, body {
             overflow-x: hidden !important;
-            overflow-y: auto !important;
+            overflow-y: visible !important;
             height: auto !important;
             min-height: 100vh !important;
+            position: static !important;
+            touch-action: pan-y !important;
+            -webkit-overflow-scrolling: touch !important;
         }
 
-        /* پس‌زمینه پویا، گرم و مدرن رستورانی با نورپردازی آمبینت */
         body {
             background-color: var(--bg-base);
             background-image: 
@@ -46,15 +48,14 @@ HTML_TEMPLATE = """
                 linear-gradient(180deg, #0B0F19 0%, #111827 100%);
             background-attachment: fixed;
             color: var(--text-main);
-            padding: 25px 15px 80px 15px;
+            padding: 25px 15px 120px 15px;
             display: flex;
             justify-content: center;
         }
 
-        .container { width: 100%; max-width: 680px; }
+        .container { width: 100%; max-width: 680px; position: static !important; }
 
-        /* هدر رستورانی شیک با نمادهای بصری */
-        .header { text-align: center; margin-bottom: 25px; position: relative; }
+        .header { text-align: center; margin-bottom: 25px; }
         .badge {
             display: inline-flex;
             align-items: center;
@@ -67,7 +68,6 @@ HTML_TEMPLATE = """
             font-size: 13px;
             font-weight: 700;
             margin-bottom: 12px;
-            backdrop-filter: blur(10px);
         }
         h1 {
             font-size: 34px;
@@ -76,11 +76,9 @@ HTML_TEMPLATE = """
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
-            letter-spacing: -0.5px;
         }
-        p.subtitle { color: var(--text-muted); font-size: 14px; font-weight: 400; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; }
 
-        /* پنل جستجوی شیشه‌ای و مدرن */
         .search-panel {
             background: var(--card-glass);
             backdrop-filter: blur(20px);
@@ -88,8 +86,10 @@ HTML_TEMPLATE = """
             border: 1px solid var(--card-border);
             border-radius: 28px;
             padding: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 94, 58, 0.1);
-            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 10;
         }
 
         .section-title {
@@ -110,7 +110,6 @@ HTML_TEMPLATE = """
             color: white;
             font-size: 14px;
             outline: none;
-            transition: 0.2s;
         }
         .add-box input:focus { border-color: var(--accent-warm); }
         .add-btn {
@@ -121,7 +120,6 @@ HTML_TEMPLATE = """
             border-radius: 14px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
         }
 
         .pages-list {
@@ -143,7 +141,6 @@ HTML_TEMPLATE = """
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: 0.2s;
         }
         .chip.active {
             background: var(--primary-gradient);
@@ -154,7 +151,6 @@ HTML_TEMPLATE = """
         }
         .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
 
-        /* فیلتر تاریخ */
         .time-filter {
             display: flex;
             background: rgba(11, 15, 25, 0.7);
@@ -172,13 +168,11 @@ HTML_TEMPLATE = """
             border-radius: 12px;
             cursor: pointer;
             color: var(--text-muted);
-            transition: 0.2s;
         }
         .time-btn.active {
             background: rgba(255, 255, 255, 0.15);
             color: #FFF;
             font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .food-input {
@@ -191,12 +185,8 @@ HTML_TEMPLATE = """
             font-size: 15px;
             outline: none;
             margin-bottom: 16px;
-            transition: 0.2s;
         }
-        .food-input:focus {
-            border-color: #FF5E3A;
-            box-shadow: 0 0 20px rgba(255, 94, 58, 0.25);
-        }
+        .food-input:focus { border-color: #FF5E3A; }
 
         .search-btn {
             width: 100%;
@@ -209,39 +199,54 @@ HTML_TEMPLATE = """
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 12px 28px rgba(255, 94, 58, 0.4);
-            transition: 0.2s;
         }
-        .search-btn:active { transform: scale(0.98); }
+
+        /* ظرف اصلی نتایج */
+        #resultsWrapper {
+            width: 100%;
+            margin-top: 25px;
+            position: relative;
+            z-index: 5;
+        }
 
         /* ======================================================== */
-        /* رفع کامل باگ اسکرول و حذف تب‌ها و کادرهای زشت گوگل */
+        /* استایل‌های اجباری برای شکستن قفل اسکرول گوگل */
         /* ======================================================== */
         
-        /* ۱. حذف باکس سرچ و تب‌های سفید Image/Web */
         .gsc-search-box, 
         .gsc-tabsArea, 
         .gcse-search-box,
         .gsc-resultsHeader,
         .gsc-adBlock,
-        .gsc-modal-background-image,
         .gsc-results-close-btn {
             display: none !important;
         }
 
-        /* ۲. شکستن قفل اسکرول گوگل */
+        /* حذف پرده سیاه مزاحم */
+        .gsc-modal-background-image {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            width: 0 !important;
+        }
+
+        /* باز کردن قفل اسکرول ریشه */
         .gsc-overflow-hidden {
             overflow: visible !important;
             position: static !important;
+            height: auto !important;
         }
 
-        /* ۳. قرار دادن کارت‌های گوگل درون جریان صفحه به شکل کارت‌های شیک */
+        /* کارت‌ها به صورت کامل در صفحه جریان پیدا کنند */
         .gsc-results-wrapper-overlay, 
         .gsc-results-wrapper-nooverlay {
-            position: relative !important;
+            position: static !important;
             top: auto !important;
             left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
             width: 100% !important;
-            max-width: 100% !important;
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
@@ -249,7 +254,7 @@ HTML_TEMPLATE = """
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
-            margin-top: 25px !important;
+            margin: 0 !important;
             z-index: 1 !important;
         }
 
@@ -257,23 +262,19 @@ HTML_TEMPLATE = """
             background: transparent !important;
             border: none !important;
             padding: 0 !important;
+            width: 100% !important;
         }
 
-        /* استایل اختصاصی کارت‌های غذا */
+        /* کارت‌های زیبای غذا */
         .gsc-webResult.gsc-result {
             background: var(--card-glass) !important;
             backdrop-filter: blur(16px) !important;
             -webkit-backdrop-filter: blur(16px) !important;
             border: 1px solid var(--card-border) !important;
             border-radius: 20px !important;
-            padding: 18px !important;
+            padding: 20px !important;
             margin-bottom: 16px !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25) !important;
-            transition: 0.2s !important;
-        }
-        .gsc-webResult.gsc-result:hover {
-            border-color: rgba(255, 94, 58, 0.45) !important;
-            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
         }
 
         .gs-title, .gs-title * {
@@ -281,11 +282,11 @@ HTML_TEMPLATE = """
             font-size: 17px !important;
             font-weight: 800 !important;
             text-decoration: none !important;
-            line-height: 1.4 !important;
+            line-height: 1.5 !important;
         }
         .gs-snippet {
             color: #94A3B8 !important;
-            font-size: 13.5px !important;
+            font-size: 14px !important;
             line-height: 1.7 !important;
             margin-top: 10px !important;
         }
@@ -294,27 +295,28 @@ HTML_TEMPLATE = """
             color: #10B981 !important;
             font-size: 12px !important;
             font-weight: bold !important;
+            margin-top: 6px !important;
+            display: inline-block !important;
         }
 
-        /* شماره صفحات زیر نتایج */
+        /* دکمه‌های صفحه بعد */
         .gsc-cursor-box {
-            margin: 30px 0 !important;
+            margin: 35px 0 !important;
             text-align: center !important;
         }
         .gsc-cursor-page {
-            background: rgba(255, 255, 255, 0.08) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid var(--card-border) !important;
             color: white !important;
-            padding: 8px 14px !important;
+            padding: 10px 16px !important;
             border-radius: 12px !important;
-            margin: 0 4px !important;
+            margin: 0 5px !important;
             font-size: 14px !important;
             font-weight: bold !important;
             display: inline-block !important;
         }
         .gsc-cursor-current-page {
             background: var(--primary-gradient) !important;
-            border-color: transparent !important;
         }
     </style>
 </head>
@@ -323,11 +325,11 @@ HTML_TEMPLATE = """
         <div class="header">
             <span class="badge">🍽️ فود یاب اینستاگرام</span>
             <h1>کافه و رستوران یاب</h1>
-            <p class="subtitle">یافتن مستقیم غذاها، منوها و آدرس دقیق رستوران‌ها در اینستاگرام</p>
+            <p class="subtitle">یافتن مستقیم غذاها، منوها و آدرس رستوران‌ها </p>
         </div>
 
         <div class="search-panel">
-            <span class="section-title">➕ افزودن فودبلاگر جدید به لیست:</span>
+            <span class="section-title">➕ افزودن فودبلاگر جدید:</span>
             <div class="add-box">
                 <input type="text" id="newPage" placeholder="مثال: شیراز یامی یا dina_taster">
                 <button class="add-btn" onclick="addNewPage()">افزودن</button>
@@ -336,20 +338,20 @@ HTML_TEMPLATE = """
             <span class="section-title">🎯 انتخاب فودبلاگرها (جستجوی همزمان):</span>
             <div class="pages-list" id="pagesContainer"></div>
 
-            <span class="section-title">📅 بازه زمانی انتشار پست:</span>
+            <span class="section-title">📅 بازه زمانی:</span>
             <div class="time-filter">
                 <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
                 <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
                 <div class="time-btn" id="time-all" onclick="setTime('all')">همه زمان‌ها</div>
             </div>
 
-            <span class="section-title">🍲 نام غذا، دسر یا نوشیدنی:</span>
-            <input type="text" class="food-input" id="food" placeholder="مثال: شاورما، کباب کوبیده، پیتزا ناپلی، دیزی..." onkeypress="handleKeyPress(event)">
+            <span class="section-title">🍲 نام غذا یا نوشیدنی:</span>
+            <input type="text" class="food-input" id="food" placeholder="مثال: شاورما، کباب، پیتزا..." onkeypress="handleKeyPress(event)">
 
             <button class="search-btn" onclick="executeGoogleSearch()">🔍 جستجوی هوشمند در پست‌ها</button>
         </div>
 
-        <!-- کارت‌های نتایج مستقیما اینجا چیده می‌شوند و به پایین اسکرول می‌خورند -->
+        <!-- کادر نتایج با اسکرول نامحدود -->
         <div id="resultsWrapper">
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
@@ -412,6 +414,40 @@ HTML_TEMPLATE = """
             }
         }
 
+        // تابع شکستن قطعی قفل اسکرول گوگل
+        function unlockGoogleScrollTrap() {
+            let attempts = 0;
+            const interval = setInterval(() => {
+                attempts++;
+                
+                // ۱. باز کردن اجباری اسکرول در تمام ریشه‌ها
+                document.documentElement.style.setProperty('overflow', 'visible', 'important');
+                document.documentElement.style.setProperty('position', 'static', 'important');
+                document.body.style.setProperty('overflow', 'visible', 'important');
+                document.body.style.setProperty('position', 'static', 'important');
+                document.body.classList.remove('gsc-overflow-hidden');
+
+                // ۲. حذف فیزیکی پرده مزاحم گوگل
+                const modal = document.querySelector('.gsc-modal-background-image');
+                if (modal) {
+                    modal.style.display = 'none';
+                    modal.remove();
+                }
+
+                // ۳. آزاد کردن کانتینر نتایج
+                const overlay = document.querySelector('.gsc-results-wrapper-overlay');
+                if (overlay) {
+                    overlay.style.setProperty('position', 'static', 'important');
+                    overlay.style.setProperty('height', 'auto', 'important');
+                    overlay.style.setProperty('overflow', 'visible', 'important');
+                }
+
+                if (attempts > 30) {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+
         function executeGoogleSearch() {
             const food = document.getElementById('food').value.trim();
 
@@ -432,7 +468,6 @@ HTML_TEMPLATE = """
                 pagesQuery = '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
             }
 
-            // فیلتر دقیق تاریخ
             let dateFilter = '';
             const now = new Date();
             if (selectedTime === 'm') {
@@ -454,8 +489,19 @@ HTML_TEMPLATE = """
             const element = google.search.cse.element.getElement('foodyab_results');
             if (element) {
                 element.execute(finalQuery);
+                
+                // شکستن قفل اسکرول بلافاصله پس از سرچ
+                unlockGoogleScrollTrap();
+
+                // هدایت نرم صفحه به سمت نتایج
+                setTimeout(() => {
+                    const resultsEl = document.getElementById('resultsWrapper');
+                    if (resultsEl) {
+                        resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 600);
             } else {
-                alert('موتور جستجو در حال آماده‌سازی است، لطفاً دوباره دکمه را بزنید.');
+                alert('موتور جستجو در حال آماده‌سازی است، لطفاً دوباره امتحان کنید.');
             }
         }
 
