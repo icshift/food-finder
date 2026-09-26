@@ -382,7 +382,7 @@ HTML_TEMPLATE = """
             <div id="insta-fields">
                 <span class="section-title">➕ افزودن فودبلاگر جدید:</span>
                 <div class="add-box">
-                    <input type="text" id="newPage" placeholder="مثال: شیراز یامی یا dina_taster">
+                    <input type="text" id="newPage" placeholder="مانند : dina_taster">
                     <button class="add-btn" onclick="addNewPage()">افزودن</button>
                 </div>
 
