@@ -1,7 +1,12 @@
 import os
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, send_from_directory
 
 app = Flask(__name__)
+
+# مسیر فراخوانی عکس لوگو از مخزن گیت‌هاب
+@app.route('/logo.png')
+def serve_logo():
+    return send_from_directory('.', 'logo.png')
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -9,7 +14,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فود یاب | کافه و رستوران </title>
+    <title>فود یاب | موتور هوشمند جستجوی خوراک</title>
     
     <!-- اسکریپت رسمی گوگل اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
@@ -46,36 +51,28 @@ HTML_TEMPLATE = """
                 linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
             background-attachment: fixed;
             color: var(--text-main);
-            padding: 25px 15px 120px 15px;
+            padding: 20px 15px 60px 15px;
             display: flex;
             justify-content: center;
         }
 
         .container { width: 100%; max-width: 680px; }
 
-        .header { text-align: center; margin-bottom: 25px; }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #FFE8EC;
-            color: var(--primary);
-            border: 1px solid rgba(255, 71, 87, 0.2);
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 10px;
+        /* هدر به همراه لوگوی اصلی */
+        .header { text-align: center; margin-bottom: 22px; }
+        .main-logo {
+            width: 125px;
+            height: 125px;
+            object-fit: cover;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 12px;
+            transition: transform 0.3s;
         }
-        h1 {
-            font-size: 34px;
-            font-weight: 900;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
-        }
-        p.subtitle { color: var(--text-muted); font-size: 14px; }
+        .main-logo:hover { transform: scale(1.03); }
+        
+        p.subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
         .mode-switch {
             display: flex;
@@ -268,73 +265,46 @@ HTML_TEMPLATE = """
             margin-top: 25px;
         }
 
-        /* ======================================================== */
-        /* حذف قطعی گزینه‌های مزاحم و لینک Search on Google */
-        /* ======================================================== */
+        /* فوتر شیک و مینیمال با لوگوی کوچک */
+        .site-footer {
+            margin-top: 50px;
+            padding: 25px 10px;
+            text-align: center;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 14px;
+            opacity: 0.9;
+        }
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* استایل‌های گوگل و مخفی‌سازی اضافات */
+        .gsc-search-box, .gsc-tabsArea, .gcse-search-box, .gsc-resultsHeader, .gsc-adBlock, .gsc-results-close-btn, .gsc-modal-background-image {
+            display: none !important;
+        }
+        .gcsc-branding, .gcsc-branding-text, .gcsc-branding-img, .gcsc-branding-clickable, .gsc-branding, .gsc-branding-text, .gsc-branding-img {
+            display: none !important; visibility: hidden !important; height: 0 !important; opacity: 0 !important;
+        }
+        .gsc-results-search-on-google, .gsc-results-search-on-google-box, .gsc-results-search-on-google-container, #resultsWrapper a[href*="google.com/search"], #resultsWrapper a[href*="client=ms-google-coop"] {
+            display: none !important; visibility: hidden !important; height: 0 !important; opacity: 0 !important; pointer-events: none !important;
+        }
+        .gsc-overflow-hidden { overflow: visible !important; position: static !important; }
+        .gsc-results-wrapper-overlay, .gsc-results-wrapper-nooverlay {
+            position: static !important; width: 100% !important; height: auto !important; max-height: none !important; overflow: visible !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
+        }
+        .gsc-control-cse { background: transparent !important; border: none !important; padding: 0 !important; }
         
-        .gsc-search-box, 
-        .gsc-tabsArea, 
-        .gcse-search-box,
-        .gsc-resultsHeader,
-        .gsc-adBlock,
-        .gsc-results-close-btn,
-        .gsc-modal-background-image {
-            display: none !important;
-        }
-
-        /* حذف واترمارک و متن برند گوگل */
-        .gcsc-branding,
-        .gcsc-branding-text,
-        .gcsc-branding-img,
-        .gcsc-branding-clickable,
-        .gsc-branding,
-        .gsc-branding-text,
-        .gsc-branding-img {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            opacity: 0 !important;
-        }
-
-        /* حذف ۱۰۰٪ گزینه Search on Google که در عکس فرستادید */
-        .gsc-results-search-on-google,
-        .gsc-results-search-on-google-box,
-        .gsc-results-search-on-google-container,
-        #resultsWrapper a[href*="google.com/search"],
-        #resultsWrapper a[href*="client=ms-google-coop"] {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        .gsc-overflow-hidden {
-            overflow: visible !important;
-            position: static !important;
-        }
-
-        .gsc-results-wrapper-overlay, 
-        .gsc-results-wrapper-nooverlay {
-            position: static !important;
-            width: 100% !important;
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-        }
-
-        .gsc-control-cse {
-            background: transparent !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-
         .gsc-webResult.gsc-result {
             background: #FFFFFF !important;
             border: 1px solid #E2E8F0 !important;
@@ -393,10 +363,10 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
+        <!-- هدر با لوگوی بزرگ و شیک -->
         <div class="header">
-            <span class="badge">🍽️ فود یاب | خوراک</span>
-            <h1>کافه و رستوران </h1>
-            <p class="subtitle">یافتن سریع غذاها، منوها و آدرس رستوران‌ها</p>
+            <img src="/logo.png" alt="فود یاب" class="main-logo">
+            <p class="subtitle">راهنمای هوشمند کافه، رستوران و سفارش آنلاین</p>
         </div>
 
         <div class="mode-switch">
@@ -404,7 +374,7 @@ HTML_TEMPLATE = """
                 <span>📸 اینستاگرام (فودبلاگرها)</span>
             </div>
             <div class="mode-btn" id="btn-snapp" onclick="switchMode('snapp')">
-                <span>🛵 اسنپ‌فود (سفارش و منو)</span>
+                <span>🛵 اسنپ‌فود</span>
             </div>
         </div>
 
@@ -450,6 +420,12 @@ HTML_TEMPLATE = """
         <div id="resultsWrapper">
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
+
+        <!-- فوتر مینیمال با لوگوی کوچک -->
+        <footer class="site-footer">
+            <img src="/logo.png" alt="فود یاب" class="footer-logo">
+            <p class="footer-text">فود یاب | دستیار هوشمند کافه‌رستوران‌گردی</p>
+        </footer>
     </div>
 
     <script>
@@ -559,7 +535,6 @@ HTML_TEMPLATE = """
                     overlay.style.setProperty('overflow', 'visible', 'important');
                 }
 
-                // حذف فیزیکی لینک Search on Google
                 document.querySelectorAll('#resultsWrapper a[href*="google.com/search"], .gsc-results-search-on-google').forEach(el => {
                     el.remove();
                 });
