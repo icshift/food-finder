@@ -1,34 +1,9 @@
 import os
+import urllib.parse
 from flask import Flask, request, jsonify, render_template_string
 from googlesearch import search
-import urllib.parse
-import urllib.request
-import re
 
 app = Flask(__name__)
-
-def get_instagram_preview(url):
-    try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)'}
-        )
-        with urllib.request.urlopen(req, timeout=3) as resp:
-            html = resp.read().decode('utf-8', errors='ignore')
-            img_match = re.search(r'<meta property="og:image" content="([^"]+)"', html)
-            desc_match = re.search(r'<meta property="og:description" content="([^"]+)"', html)
-            
-            img_url = img_match.group(1) if img_match else None
-            description = desc_match.group(1) if desc_match else "مشاهده جزئیات و آدرس در اینستاگرام..."
-            
-            if description and "likes, " in description:
-                parts = description.split(":", 1)
-                if len(parts) > 1:
-                    description = parts[1].strip().strip('"')
-                    
-            return img_url, description
-    except:
-        return None, "برای دیدن آدرس و جزئیات روی دکمه مشاهده بزنید."
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -36,66 +11,336 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فود یاب هوشمند</title>
+    <title>فود یاب | جستجوی خوراک و رستوران</title>
     <style>
-        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .container { background: white; width: 100%; max-width: 480px; padding: 20px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-        h2 { text-align: center; color: #d62976; margin: 5px 0 15px 0; }
-        .label-title { font-weight: bold; font-size: 13px; color: #4a5568; margin-bottom: 8px; display: block; }
-        .add-box { display: flex; gap: 8px; margin-bottom: 12px; }
-        .add-box input { flex: 1; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; }
-        .add-btn { background: #38a169; color: white; border: none; padding: 10px 16px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .pages-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; max-height: 120px; overflow-y: auto; padding: 2px; }
-        .chip { background: #edf2f7; border: 2px solid #cbd5e0; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none; }
-        .chip.active { background: #d62976; color: white; border-color: #d62976; font-weight: bold; }
-        .chip .del-btn { color: #888; font-weight: bold; margin-right: 4px; }
-        .chip.active .del-btn { color: #ffe4e6; }
-        .time-filter { display: flex; background: #edf2f7; padding: 4px; border-radius: 12px; margin-bottom: 15px; gap: 4px; }
-        .time-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 13px; border-radius: 8px; cursor: pointer; color: #4a5568; font-weight: 500; transition: 0.2s; }
-        .time-btn.active { background: white; color: #d62976; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
-        .food-input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; margin-bottom: 12px; }
-        .food-input:focus { border-color: #d62976; }
-        .search-btn { width: 100%; padding: 14px; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        #loading { display: none; text-align: center; margin: 15px 0; color: #d62976; font-weight: bold; }
-        .results { margin-top: 20px; }
-        .food-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
-        .food-card img { width: 100%; height: 210px; object-fit: cover; background: #e2e8f0; display: block; }
-        .card-body { padding: 14px; }
-        .card-desc { font-size: 13px; color: #4a5568; line-height: 1.6; margin-bottom: 12px; max-height: 80px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; }
-        .card-footer a { background: #d62976; color: white; text-decoration: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; }
-        .source-tag { font-size: 12px; color: #718096; background: #edf2f7; padding: 4px 8px; border-radius: 6px; }
-        .images-btn { display: block; text-align: center; background: #4285f4; color: white; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
+        :root {
+            --primary: #FF5E3A;
+            --primary-gradient: linear-gradient(135deg, #FF5E3A 0%, #FF2A54 50%, #C026D3 100%);
+            --bg-dark: #0F172A;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+        }
+
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 94, 58, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(192, 38, 211, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px 15px 50px 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        /* هدر رستورانی شیک */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255, 94, 58, 0.15);
+            color: #FF5E3A;
+            border: 1px solid rgba(255, 94, 58, 0.3);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* پنل جستجو */
+        .search-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* بخش افزودن پیج */
+        .add-box { display: flex; gap: 8px; margin-bottom: 14px; }
+        .add-box input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        .add-box input:focus { border-color: #FF5E3A; }
+        .add-btn {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* چیپ‌های پیج‌ها */
+        .pages-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .chip.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(255, 94, 58, 0.3);
+        }
+        .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
+
+        /* فیلتر تاریخ */
+        .time-filter {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            gap: 4px;
+        }
+        .time-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .time-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* ورودی غذا */
+        .food-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 14px;
+            transition: 0.2s;
+        }
+        .food-input:focus { border-color: #FF5E3A; box-shadow: 0 0 15px rgba(255, 94, 58, 0.2); }
+
+        .search-btn {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 94, 58, 0.35);
+            transition: 0.3s;
+        }
+        .search-btn:active { transform: scale(0.98); }
+
+        /* لودینگ متحرک */
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+            font-weight: bold;
+            color: #FF5E3A;
+            font-size: 15px;
+        }
+
+        /* کارت‌های پیش‌نمایش پست‌ها (۱۰ تا ۱۵ تایی) */
+        .results-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .result-card:hover {
+            border-color: rgba(255, 94, 58, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-badge {
+            background: rgba(255, 255, 255, 0.08);
+            color: #FF5E3A;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .post-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.5;
+        }
+        .post-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border-right: 3px solid #FF5E3A;
+        }
+        .card-action {
+            margin-top: 5px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .insta-btn {
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .insta-btn:hover { opacity: 0.9; }
+
+        .more-images-box {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .more-images-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: 14px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .more-images-btn:hover { background: rgba(255, 255, 255, 0.15); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🍔 فود یاب هوشمند</h2>
-
-        <span class="label-title">➕ افزودن پیج فودبلاگر:</span>
-        <div class="add-box">
-            <input type="text" id="newPage" placeholder="مثلاً: شیراز یامی یا milad_taster">
-            <button class="add-btn" onclick="addNewPage()">افزودن</button>
+        <div class="header">
+            <span class="badge">🔥 نسخه اختصاصی فودبلاگرها</span>
+            <h1>فود یاب هوشمند</h1>
+            <p class="subtitle">یافتن مستقیم غذا و آدرس رستوران‌ها بدون گم شدن در تبلیغات</p>
         </div>
 
-        <span class="label-title">🎯 انتخاب پیج‌ها:</span>
-        <div class="pages-list" id="pagesContainer"></div>
+        <div class="search-panel">
+            <span class="section-title">➕ افزودن فودبلاگر جدید:</span>
+            <div class="add-box">
+                <input type="text" id="newPage" placeholder="مثال: شیراز یامی یا dina_taster">
+                <button class="add-btn" onclick="addNewPage()">افزودن</button>
+            </div>
 
-        <span class="label-title">📅 بازه زمانی انتشار پست:</span>
-        <div class="time-filter">
-            <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
-            <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
-            <div class="time-btn" id="time-all" onclick="setTime('all')">همه زمان‌ها</div>
+            <span class="section-title">🎯 انتخاب فودبلاگرها (چندتایی):</span>
+            <div class="pages-list" id="pagesContainer"></div>
+
+            <span class="section-title">📅 بازه زمانی:</span>
+            <div class="time-filter">
+                <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
+                <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
+                <div class="time-btn" id="time-all" onclick="setTime('all')">همه زمان‌ها</div>
+            </div>
+
+            <span class="section-title">🍲 نام غذا یا نوشیدنی:</span>
+            <input type="text" class="food-input" id="food" placeholder="مثال: کباب کوبیده، شاورما، پیتزا، پاستا...">
+
+            <button class="search-btn" onclick="startSearch()">🔍 جستجوی ۱۰ تا ۱۵ پست برتر</button>
+
+            <div id="loading">✨ در حال کاوش و استخراج پست‌های مرتبط...</div>
         </div>
 
-        <span class="label-title">🍲 نام غذا:</span>
-        <input type="text" class="food-input" id="food" placeholder="مثلاً: کباب کوبیده، شاورما، پیتزا">
-
-        <button class="search-btn" onclick="startSearch()">🔍 جستجوی پیشرفته</button>
-
-        <div id="loading">⏳ در حال آماده‌سازی اطلاعات و تصاویر...</div>
-        <div class="results" id="results"></div>
+        <div id="resultsArea"></div>
     </div>
 
     <script>
@@ -151,7 +396,7 @@ HTML_TEMPLATE = """
 
         async function startSearch() {
             const food = document.getElementById('food').value.trim();
-            const resultsDiv = document.getElementById('results');
+            const resultsArea = document.getElementById('resultsArea');
             const loading = document.getElementById('loading');
 
             if (selectedPages.size === 0) {
@@ -159,11 +404,11 @@ HTML_TEMPLATE = """
                 return;
             }
             if (!food) {
-                alert('نام غذا را بنویسید!');
+                alert('لطفاً نام غذا را بنویسید!');
                 return;
             }
 
-            resultsDiv.innerHTML = '';
+            resultsArea.innerHTML = '';
             loading.style.display = 'block';
 
             const pagesArray = Array.from(selectedPages);
@@ -178,35 +423,52 @@ HTML_TEMPLATE = """
                 const data = await resp.json();
                 loading.style.display = 'none';
 
-                if (data.cards && data.cards.length > 0) {
-                    data.cards.forEach((card, index) => {
-                        const imgHtml = card.image ? `<img src="${card.image}" onerror="this.style.display='none'">` : '';
-                        resultsDiv.innerHTML += `
-                            <div class="food-card">
-                                ${imgHtml}
-                                <div class="card-body">
-                                    <div class="card-desc">${card.desc}</div>
-                                    <div class="card-footer">
-                                        <span class="source-tag">📌 پست ${index + 1}</span>
-                                        <a href="${card.url}" target="_blank">مشاهده در اینستاگرام</a>
-                                    </div>
+                if (!data.results || data.results.length === 0) {
+                    resultsArea.innerHTML = `
+                        <div class="result-card" style="text-align:center;">
+                            <p style="color:var(--text-muted);">پست مستقیمی یافت نشد. می‌توانید آلبوم عکس‌ها را در زیر ببینید:</p>
+                        </div>
+                    `;
+                } else {
+                    let html = `
+                        <div class="results-header">
+                            <span>🎯 نتایج پیدا شده (${data.results.length} پست برتر):</span>
+                        </div>
+                    `;
+
+                    data.results.forEach((item, index) => {
+                        html += `
+                            <div class="result-card">
+                                <div class="card-top">
+                                    <span class="card-badge">📌 پست شماره ${index + 1}</span>
+                                    <span style="font-size:12px; color:var(--text-muted);">${item.source}</span>
+                                </div>
+                                <div class="post-title">${item.title}</div>
+                                ${item.desc ? `<div class="post-desc">📍 <b>آدرس و جزئیات کپشن:</b><br>${item.desc}</div>` : ''}
+                                <div class="card-action">
+                                    <a class="insta-btn" href="${item.url}" target="_blank" rel="noopener noreferrer">
+                                        <span>مشاهده در اینستاگرام</span> ↗
+                                    </a>
                                 </div>
                             </div>
                         `;
                     });
-                } else {
-                    resultsDiv.innerHTML = '<p style="text-align:center; color:#718096;">برای دیدن نتایج مستقیم روی دکمه زیر بزنید:</p>';
+
+                    resultsArea.innerHTML = html;
                 }
 
-                resultsDiv.innerHTML += `
-                    <a class="images-btn" href="${data.images_url}" target="_blank">
-                        🖼️ مشاهده آلبوم تصاویر و پست‌ها
-                    </a>
+                // دکمه باز کردن آلبوم عکس تکمیلی
+                resultsArea.innerHTML += `
+                    <div class="more-images-box">
+                        <a class="more-images-btn" href="${data.images_url}" target="_blank" rel="noopener noreferrer">
+                            🖼️ باز کردن آلبوم تصاویر تکمیلی در گوگل
+                        </a>
+                    </div>
                 `;
 
             } catch (err) {
                 loading.style.display = 'none';
-                alert('خطا در اتصال به سرور.');
+                alert('خطا در ارتباط با سرور.');
             }
         }
 
@@ -240,26 +502,51 @@ def search_api():
     elif time_filter == 'y':
         tbs_param = "&tbs=qdr:y"
         
-    cards = []
+    results_list = []
     try:
-        links = list(search(query, num_results=6))
-        for link in links:
-            if "/p/" in link or "/reel/" in link:
-                img_url, description = get_instagram_preview(link)
-                cards.append({
-                    "url": link,
-                    "image": img_url,
-                    "desc": description
+        # استخراج هوشمند تا ۱۵ پست همراه با تیتر و خلاصه آدرس کپشن
+        search_items = list(search(query, num_results=15, advanced=True))
+        for item in search_items:
+            url = getattr(item, 'url', str(item))
+            if "instagram.com" in url:
+                raw_title = getattr(item, 'title', 'پست معرفی غذا')
+                # پاک کردن کلمات اضافه از تیتر
+                clean_title = raw_title.replace("• Instagram photos and videos", "").replace("on Instagram", "").replace("- Instagram", "").strip()
+                
+                desc = getattr(item, 'description', '')
+                
+                # تشخیص نام بلاگر برای برچسب
+                source = "اینستاگرام"
+                for p in pages:
+                    if p.lower() in clean_title.lower() or p.lower() in desc.lower():
+                        source = f"پیج {p}"
+                        break
+                        
+                results_list.append({
+                    "url": url,
+                    "title": clean_title,
+                    "desc": desc,
+                    "source": source
                 })
-                if len(cards) >= 4:
-                    break
     except Exception as e:
-        print("Search error:", e)
+        # اگر نسخه کتابخانه از advanced پشتیبانی نکرد، با حالت ساده دریافت میکند
+        try:
+            links = list(search(query, num_results=12))
+            for link in links:
+                if "instagram.com" in link:
+                    results_list.append({
+                        "url": link,
+                        "title": "پست مرتبط در اینستاگرام",
+                        "desc": "برای مشاهده جزئیات منو، قیمت و آدرس دقیق رستوران روی دکمه مشاهده بزنید.",
+                        "source": "اینستاگرام"
+                    })
+        except Exception as err:
+            print("Fallback error:", err)
 
     encoded_q = urllib.parse.quote(query)
     images_url = f"https://www.google.com/search?q={encoded_q}&tbm=isch{tbs_param}"
 
-    return jsonify({"cards": cards, "images_url": images_url})
+    return jsonify({"results": results_list, "images_url": images_url})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
