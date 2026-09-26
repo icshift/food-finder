@@ -9,7 +9,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فود | کافه و رستوران یاب</title>
+    <title>فود یاب | کافه و رستوران </title>
     
     <!-- اسکریپت رسمی گوگل اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
@@ -37,7 +37,6 @@ HTML_TEMPLATE = """
             -webkit-overflow-scrolling: touch !important;
         }
 
-        /* تم روشن، دلنشین و اشتهابرانگیز */
         body {
             background-color: #F8FAF8;
             background-image: 
@@ -78,7 +77,6 @@ HTML_TEMPLATE = """
         }
         p.subtitle { color: var(--text-muted); font-size: 14px; }
 
-        /* سوئیچ اصلی: اینستاگرام یا اسنپ‌فود */
         .mode-switch {
             display: flex;
             background: #E2E8F0;
@@ -111,7 +109,6 @@ HTML_TEMPLATE = """
             color: var(--snapp-color);
         }
 
-        /* پنل جستجو شیشه‌ای روشن */
         .search-panel {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -207,7 +204,6 @@ HTML_TEMPLATE = """
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
         }
 
-        /* بخش اختصاصی اسنپ‌فود (انتخاب شهر) */
         .city-chips {
             display: flex;
             flex-wrap: wrap;
@@ -273,7 +269,7 @@ HTML_TEMPLATE = """
         }
 
         /* ======================================================== */
-        /* استایل‌های روشن برای نتایج و حذف کامل واترمارک گوگل */
+        /* حذف قطعی گزینه‌های مزاحم و لینک Search on Google */
         /* ======================================================== */
         
         .gsc-search-box, 
@@ -286,7 +282,7 @@ HTML_TEMPLATE = """
             display: none !important;
         }
 
-        /* حذف ۱۰۰٪ لوگو و متون تبلیغاتی گوگل */
+        /* حذف واترمارک و متن برند گوگل */
         .gcsc-branding,
         .gcsc-branding-text,
         .gcsc-branding-img,
@@ -297,8 +293,22 @@ HTML_TEMPLATE = """
             display: none !important;
             visibility: hidden !important;
             height: 0 !important;
-            width: 0 !important;
             opacity: 0 !important;
+        }
+
+        /* حذف ۱۰۰٪ گزینه Search on Google که در عکس فرستادید */
+        .gsc-results-search-on-google,
+        .gsc-results-search-on-google-box,
+        .gsc-results-search-on-google-container,
+        #resultsWrapper a[href*="google.com/search"],
+        #resultsWrapper a[href*="client=ms-google-coop"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         .gsc-overflow-hidden {
@@ -325,7 +335,6 @@ HTML_TEMPLATE = """
             padding: 0 !important;
         }
 
-        /* کارت‌های شیک سفید با استایل روشن */
         .gsc-webResult.gsc-result {
             background: #FFFFFF !important;
             border: 1px solid #E2E8F0 !important;
@@ -363,7 +372,7 @@ HTML_TEMPLATE = """
             display: inline-block !important;
         }
 
-        .gsc-cursor-box { margin: 35px 0 !important; text-align: center !important; }
+        .gsc-cursor-box { margin: 35px 0 15px 0 !important; text-align: center !important; }
         .gsc-cursor-page {
             background: white !important;
             border: 1px solid #CBD5E1 !important;
@@ -385,12 +394,11 @@ HTML_TEMPLATE = """
 <body>
     <div class="container">
         <div class="header">
-            <span class="badge">🍽️ فود یاب | جستجوی خوراک</span>
-            <h1>کافه و رستوران یاب</h1>
+            <span class="badge">🍽️ فود یاب | خوراک</span>
+            <h1>کافه و رستوران </h1>
             <p class="subtitle">یافتن سریع غذاها، منوها و آدرس رستوران‌ها</p>
         </div>
 
-        <!-- سوئیچ انتخاب بین اینستاگرام و اسنپ‌فود -->
         <div class="mode-switch">
             <div class="mode-btn active" id="btn-insta" onclick="switchMode('insta')">
                 <span>📸 اینستاگرام (فودبلاگرها)</span>
@@ -401,7 +409,6 @@ HTML_TEMPLATE = """
         </div>
 
         <div class="search-panel">
-            <!-- فیلدهای اختصاصی اینستاگرام -->
             <div id="insta-fields">
                 <span class="section-title">➕ افزودن فودبلاگر جدید:</span>
                 <div class="add-box">
@@ -420,7 +427,6 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <!-- فیلدهای اختصاصی اسنپ‌فود -->
             <div id="snapp-fields" style="display: none;">
                 <span class="section-title">📍 انتخاب شهر شما:</span>
                 <div class="city-chips">
@@ -435,21 +441,19 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <!-- کادر نام غذا (مشترک) -->
             <span class="section-title">🍲 نام غذا یا دسر مورد نظر:</span>
             <input type="text" class="food-input" id="food" placeholder="مثال: شاورما، پیتزا، کباب کوبیده، پاستا..." onkeypress="handleKeyPress(event)">
 
             <button class="search-btn" id="mainSearchBtn" onclick="executeSmartSearch()">🔍 جستجوی هوشمند در پست‌های اینستاگرام</button>
         </div>
 
-        <!-- کادر نتایج -->
         <div id="resultsWrapper">
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
     </div>
 
     <script>
-        let currentMode = 'insta'; // 'insta' یا 'snapp'
+        let currentMode = 'insta';
         let selectedCity = 'شیراز';
         let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['شیراز یامی', 'milad_taster'];
         let selectedPages = new Set(['شیراز یامی']);
@@ -555,7 +559,12 @@ HTML_TEMPLATE = """
                     overlay.style.setProperty('overflow', 'visible', 'important');
                 }
 
-                if (attempts > 25) clearInterval(interval);
+                // حذف فیزیکی لینک Search on Google
+                document.querySelectorAll('#resultsWrapper a[href*="google.com/search"], .gsc-results-search-on-google').forEach(el => {
+                    el.remove();
+                });
+
+                if (attempts > 30) clearInterval(interval);
             }, 100);
         }
 
@@ -588,7 +597,6 @@ HTML_TEMPLATE = """
 
                 finalQuery = `site:instagram.com ${pagesQuery} ${food} ${dateFilter}`.trim();
             } else {
-                // حالت اسنپ‌فود
                 const customCity = document.getElementById('customCity').value.trim();
                 const city = customCity ? customCity : selectedCity;
                 finalQuery = `site:snappfood.ir "${city}" ${food}`.trim();
