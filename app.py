@@ -9,9 +9,9 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فود یاب  |  جستجوی اینستاگرام</title>
+    <title>فود یاب  | جستجوی خوراک و رستوران و کافه </title>
     
-    <!-- اسکریپت رسمی گوگل اختصاصی شما -->
+    <!-- اسکریپت رسمی موتور اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
 
     <style>
@@ -135,6 +135,31 @@ HTML_TEMPLATE = """
         }
         .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
 
+        /* کلیدهای انتخاب زمان */
+        .time-filter {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            gap: 4px;
+        }
+        .time-btn {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .time-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-weight: bold;
+        }
+
         .food-input {
             width: 100%;
             background: rgba(15, 23, 42, 0.6);
@@ -159,13 +184,31 @@ HTML_TEMPLATE = """
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(255, 94, 58, 0.35);
-            transition: 0.2s;
         }
-        .search-btn:active { transform: scale(0.98); }
 
-        /* استایل اختصاصی و لوکس برای کادر نتایج گوگل */
-        #resultsWrapper {
-            margin-top: 20px;
+        /* شکستن پاپ‌آپ سفید گوگل و تبدیل به کارت‌های درون‌صفحه‌ای شیک */
+        .gsc-modal-background-image {
+            display: none !important; /* حذف پرده سیاه/سفید پشت پاپ‌آپ */
+        }
+        .gsc-results-wrapper-overlay {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-top: 20px !important;
+            z-index: 1 !important;
+        }
+        .gsc-results-close-btn {
+            display: none !important; /* حذف ضربدر بستن پاپ‌آپ */
+        }
+        .gsc-overflow-hidden {
+            overflow: visible !important; /* رفع قفل شدن اسکرول صفحه */
         }
         .gsc-control-cse {
             background: transparent !important;
@@ -176,10 +219,10 @@ HTML_TEMPLATE = """
             background: var(--card-bg) !important;
             backdrop-filter: blur(12px) !important;
             border: 1px solid var(--card-border) !important;
-            border-radius: 16px !important;
+            border-radius: 18px !important;
             padding: 16px !important;
-            margin-bottom: 12px !important;
-            transition: 0.2s !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
         }
         .gsc-webResult.gsc-result:hover {
             border-color: rgba(255, 94, 58, 0.4) !important;
@@ -197,27 +240,17 @@ HTML_TEMPLATE = """
             line-height: 1.6 !important;
             margin-top: 8px !important;
         }
-        .gsc-url-top, .gsc-thumbnail-inside {
-            padding: 0 !important;
-        }
-        .gs-visibleUrl {
-            color: #10B981 !important;
-            font-size: 12px !important;
-        }
-        .gsc-cursor-box {
-            margin-top: 20px !important;
-            text-align: center !important;
-        }
+        .gsc-url-top { padding: 0 !important; }
+        .gs-visibleUrl { color: #10B981 !important; font-size: 12px !important; }
+        .gsc-cursor-box { margin-top: 20px !important; text-align: center !important; }
         .gsc-cursor-page {
             background: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
-            padding: 8px 12px !important;
+            padding: 6px 12px !important;
             border-radius: 8px !important;
             margin: 0 4px !important;
         }
-        .gsc-cursor-current-page {
-            background: #FF5E3A !important;
-        }
+        .gsc-cursor-current-page { background: #FF5E3A !important; }
     </style>
 </head>
 <body>
@@ -238,13 +271,20 @@ HTML_TEMPLATE = """
             <span class="section-title">🎯 انتخاب فودبلاگرها (چندتایی):</span>
             <div class="pages-list" id="pagesContainer"></div>
 
+            <span class="section-title">📅 بازه زمانی انتشار:</span>
+            <div class="time-filter">
+                <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
+                <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
+                <div class="time-btn" id="time-all" onclick="setTime('all')">همه زمان‌ها</div>
+            </div>
+
             <span class="section-title">🍲 نام غذا یا نوشیدنی:</span>
             <input type="text" class="food-input" id="food" placeholder="مثال: کباب کوبیده، شاورما، پیتزا، پاستا..." onkeypress="handleKeyPress(event)">
 
-            <button class="search-btn" onclick="executeGoogleSearch()">🔍 جستجوی هوشمند در نتایج زنده</button>
+            <button class="search-btn" onclick="executeGoogleSearch()">🔍 جستجوی پست‌های جدید</button>
         </div>
 
-        <!-- محل نمایش نتایج رسمی گوگل داخل خود صفحه -->
+        <!-- محل چیده شدن کارت‌ها دقیقا زیر پنل (بدون پاپ‌آپ) -->
         <div id="resultsWrapper">
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
@@ -253,6 +293,7 @@ HTML_TEMPLATE = """
     <script>
         let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['شیراز یامی', 'milad_taster'];
         let selectedPages = new Set(['شیراز یامی']);
+        let selectedTime = 'y'; // پیش‌فرض: یک سال اخیر
 
         function renderChips() {
             const container = document.getElementById('pagesContainer');
@@ -294,6 +335,12 @@ HTML_TEMPLATE = """
             renderChips();
         }
 
+        function setTime(timeType) {
+            selectedTime = timeType;
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`time-${timeType}`).classList.add('active');
+        }
+
         function handleKeyPress(e) {
             if (e.key === 'Enter') {
                 executeGoogleSearch();
@@ -312,7 +359,7 @@ HTML_TEMPLATE = """
                 return;
             }
 
-            // فرمول‌سازی جستجو
+            // ترکیب پیج‌ها
             const pagesArray = Array.from(selectedPages);
             let pagesQuery = '';
             if (pagesArray.length === 1) {
@@ -321,14 +368,33 @@ HTML_TEMPLATE = """
                 pagesQuery = '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
             }
 
-            const finalQuery = `${pagesQuery} ${food}`;
+            // محاسبه فیلتر تاریخ (حذف قطعی پست‌های قدیمی با بعد از فلان تاریخ)
+            let dateFilter = '';
+            const now = new Date();
+            if (selectedTime === 'm') {
+                // 30 روز گذشته
+                const d = new Date(new Date().setDate(now.getDate() - 30));
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                dateFilter = `after:${yyyy}-${mm}-${dd}`;
+            } else if (selectedTime === 'y') {
+                // 365 روز گذشته (1 سال اخیر)
+                const d = new Date(new Date().setFullYear(now.getFullYear() - 1));
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                dateFilter = `after:${yyyy}-${mm}-${dd}`;
+            }
 
-            // اجرای مستقیم موتور رسمی گوگل داخل المان صفحه
+            // کوئری نهایی با کنترل دقیق تاریخ
+            const finalQuery = `${pagesQuery} ${food} ${dateFilter}`.trim();
+
             const element = google.search.cse.element.getElement('foodyab_results');
             if (element) {
                 element.execute(finalQuery);
             } else {
-                alert('موتور جستجو در حال آماده‌سازی است، لطفاً ۲ ثانیه بعد دوباره دکمه را بزنید.');
+                alert('موتور جستجو در حال بارگذاری است، لطفاً مجدداً کلیک کنید.');
             }
         }
 
