@@ -7,59 +7,63 @@ from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# موتور جستجوی ضد بلاک (استخراج ۱۰ الی ۱۵ نتیجه واقعی از بینگ و داک‌داک‌گو)
-def fetch_instagram_posts(query):
+# موتور استخراج نتایج واقعی بدون سد قوانین اروپا
+def fetch_real_posts(query):
     results = []
-    
-    # روش اول: استفاده از موتور بینگ (حساس به سرور ابری نیست و اینستاگرام را عالی ایندکس میکند)
     try:
-        encoded_query = urllib.parse.quote(query)
-        url = f"https://www.bing.com/search?q={encoded_query}&count=15"
+        # استفاده از داک‌داک‌گو که سرورهای آلمان را مسدود نمی‌کند
+        url = "https://html.duckduckgo.com/html/"
+        data = urllib.parse.urlencode({'q': query}).encode('utf-8')
         
         req = urllib.request.Request(
             url,
+            data=data,
             headers={
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                'Accept-Language': 'fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7'
+                'Accept-Encoding': 'identity',
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         )
         
-        with urllib.request.urlopen(req, timeout=6) as response:
-            page_html = response.read().decode('utf-8', errors='ignore')
+        with urllib.request.urlopen(req, timeout=9) as resp:
+            content = resp.read().decode('utf-8', errors='ignore')
             
-            # استخراج بلاک‌های نتایج
-            blocks = re.findall(r'<li class="b_algo".*?</li>', page_html, re.DOTALL)
-            for block in blocks:
-                # استخراج لینک اینستاگرام
-                link_match = re.search(r'href="(https://[a-z0-9\.]*instagram\.com/[^"]+)"', block)
+            # تفکیک هر نتیجه در صفحه
+            items = content.split('class="result results_links')
+            for item in items[1:]:
+                # استخراج لینک مستقیم اینستاگرام
+                link_match = re.search(r'uddg=([^&"\']+)', item)
                 if not link_match:
                     continue
-                post_url = link_match.group(1)
+                clean_url = urllib.parse.unquote(link_match.group(1))
                 
-                # استخراج تیتر
-                title_match = re.search(r'<h2[^>]*><a[^>]*>(.*?)</a></h2>', block, re.DOTALL)
-                title = "پست معرفی غذا در اینستاگرام"
-                if title_match:
-                    raw_title = re.sub(r'<[^>]+>', '', title_match.group(1))
-                    title = html.unescape(raw_title).replace("• Instagram photos and videos", "").replace("on Instagram", "").replace("- Instagram", "").strip()
+                if "instagram.com" not in clean_url:
+                    continue
+                    
+                # استخراج عنوان پست
+                title_match = re.search(r'class="result__a"[^>]*>(.*?)</a>', item, re.DOTALL)
+                raw_title = title_match.group(1) if title_match else "معرفی رستوران و غذا"
+                clean_title = re.sub(r'<[^>]+>', '', raw_title)
+                clean_title = html.unescape(clean_title).replace("• Instagram photos and videos", "").replace("on Instagram", "").replace("- Instagram", "").strip()
                 
-                # استخراج کپشن و آدرس
-                desc_match = re.search(r'<p[^>]*>(.*?)</p>', block, re.DOTALL)
-                desc = "برای مشاهده منو، عکس‌ها و آدرس دقیق روی دکمه مشاهده در اینستاگرام بزنید."
-                if desc_match:
-                    raw_desc = re.sub(r'<[^>]+>', '', desc_match.group(1))
-                    desc = html.unescape(raw_desc).strip()
+                # استخراج آدرس و توضیحات کپشن
+                snippet_match = re.search(r'class="result__snippet"[^>]*>(.*?)</a>', item, re.DOTALL)
+                raw_snippet = snippet_match.group(1) if snippet_match else ""
+                clean_desc = re.sub(r'<[^>]+>', '', raw_snippet)
+                clean_desc = html.unescape(clean_desc).strip()
+                if not clean_desc:
+                    clean_desc = "برای مشاهده قیمت‌ها، منو و آدرس دقیق، دکمه مشاهده را لمس کنید."
                 
                 results.append({
-                    "url": post_url,
-                    "title": title,
-                    "desc": desc
+                    "url": clean_url,
+                    "title": clean_title,
+                    "desc": clean_desc
                 })
                 
                 if len(results) >= 15:
                     break
     except Exception as e:
-        print("Search error:", e)
+        print("Scraper error:", e)
 
     return results
 
@@ -69,10 +73,9 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فود یاب هوشمند | موتور جستجوی خوراک</title>
+    <title>فود یاب | جستجوی دقیق غذا و رستوران</title>
     <style>
         :root {
-            --primary: #FF5E3A;
             --primary-gradient: linear-gradient(135deg, #FF5E3A 0%, #FF2A54 50%, #C026D3 100%);
             --bg-dark: #0F172A;
             --card-bg: rgba(30, 41, 59, 0.75);
@@ -97,7 +100,6 @@ HTML_TEMPLATE = """
         }
 
         .container { width: 100%; max-width: 680px; }
-
         .header { text-align: center; margin-bottom: 25px; }
         .badge {
             display: inline-block;
@@ -128,7 +130,7 @@ HTML_TEMPLATE = """
             border-radius: 24px;
             padding: 22px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .section-title {
@@ -267,6 +269,11 @@ HTML_TEMPLATE = """
             display: flex;
             flex-direction: column;
             gap: 10px;
+            transition: 0.2s;
+        }
+        .result-card:hover {
+            border-color: rgba(255, 94, 58, 0.4);
+            transform: translateY(-2px);
         }
         .card-top {
             display: flex;
@@ -332,7 +339,7 @@ HTML_TEMPLATE = """
     <div class="container">
         <div class="header">
             <span class="badge">🔥</span>
-            <h1>فود یاب</h1>
+            <h1>فود یاب </h1>
             <p class="subtitle">یافتن مستقیم غذا و آدرس رستوران‌ها بدون گم شدن در تبلیغات</p>
         </div>
 
@@ -356,7 +363,7 @@ HTML_TEMPLATE = """
             <span class="section-title">🍲 نام غذا یا نوشیدنی:</span>
             <input type="text" class="food-input" id="food" placeholder="مثال: کباب کوبیده، شاورما، پیتزا، پاستا...">
 
-            <button class="search-btn" onclick="startSearch()">🔍 دریافت ۱۰ تا ۱۵ پست برتر</button>
+            <button class="search-btn" onclick="startSearch()">🔍 دریافت لیست پست‌های اختصاصی</button>
 
             <div id="loading">✨ در حال استخراج پست‌ها و آدرس‌ها...</div>
         </div>
@@ -447,13 +454,13 @@ HTML_TEMPLATE = """
                 if (!data.results || data.results.length === 0) {
                     resultsArea.innerHTML = `
                         <div class="result-card" style="text-align:center;">
-                            <p style="color:var(--text-muted);">پستی با این مشخصات یافت نشد. می‌توانید آلبوم عکس‌ها را در زیر ببینید:</p>
+                            <p style="color:var(--text-muted);">پستی با این مشخصات یافت نشد.</p>
                         </div>
                     `;
                 } else {
                     let html = `
                         <div class="results-header">
-                            <span>🎯 نتایج پیدا شده (${data.results.length} پست اختصاصی):</span>
+                            <span>🎯 پست‌های پیدا شده (${data.results.length} مورد مستقیم):</span>
                         </div>
                     `;
 
@@ -464,10 +471,10 @@ HTML_TEMPLATE = """
                                     <span class="card-badge">📌 پست شماره ${index + 1}</span>
                                 </div>
                                 <div class="post-title">${item.title}</div>
-                                <div class="post-desc">📍 <b>آدرس و جزئیات کپشن:</b><br>${item.desc}</div>
+                                <div class="post-desc">📍 <b>آدرس و توضیحات:</b><br>${item.desc}</div>
                                 <div class="card-action">
                                     <a class="insta-btn" href="${item.url}" target="_blank" rel="noopener noreferrer">
-                                        <span>مشاهده پست در اینستاگرام</span> ↗
+                                        <span>مشاهده در اینستاگرام</span> ↗
                                     </a>
                                 </div>
                             </div>
@@ -480,7 +487,7 @@ HTML_TEMPLATE = """
                 resultsArea.innerHTML += `
                     <div class="more-images-box">
                         <a class="more-images-btn" href="${data.images_url}" target="_blank" rel="noopener noreferrer">
-                            🖼️ دیدن آلبوم عکس‌های بیشتر در گوگل
+                            🖼️ دیدن آلبوم عکس‌های تکمیلی در گوگل
                         </a>
                     </div>
                 `;
@@ -515,8 +522,8 @@ def search_api():
         
     query = f'site:instagram.com {pages_query} {food}'
     
-    # واکشی ۱۰ الی ۱۵ پست بدون سد بلاک گوگل
-    results = fetch_instagram_posts(query)
+    # واکشی مستقیم پست‌ها بدون سد امنیتی اروپا
+    results = fetch_real_posts(query)
     
     tbs_param = ""
     if time_filter == 'm':
