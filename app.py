@@ -15,7 +15,7 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>فود یاب | موتور هوشمند جستجوی خوراک</title>
-    
+
     <!-- اسکریپت رسمی گوگل اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
 
@@ -117,105 +117,15 @@ HTML_TEMPLATE = """
             margin-bottom: 25px;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
         .section-title {
             font-size: 13px;
             font-weight: 700;
             color: var(--text-main);
-            display: block;
-        }
-
-        .badge-count {
-            font-size: 11px;
-            background: #E2E8F0;
-            color: var(--text-muted);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        /* استایل لیست فودبلاگرهای پیشنهادی قابل ویرایش */
-        .preset-list {
+            margin-bottom: 8px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-        .preset-chip {
-            background: #FFFFFF;
-            border: 1.5px dashed #CBD5E1;
-            color: #334155;
-            padding: 6px 10px 6px 12px;
-            border-radius: 14px;
-            font-size: 12.5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
         }
-        .preset-chip:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #FFF5F5;
-        }
-        .preset-chip.in-list {
-            border-style: solid;
-            border-color: #10B981;
-            color: #059669;
-            background: #ECFDF5;
-            font-weight: 600;
-        }
-        .preset-del-btn {
-            font-size: 14px;
-            color: #94A3B8;
-            margin-right: 4px;
-            line-height: 1;
-            border-radius: 50%;
-            padding: 2px;
-            transition: 0.2s;
-        }
-        .preset-del-btn:hover {
-            color: #EF4444;
-            background: #FEE2E2;
-        }
-
-        /* باکس افزودن به لیست پیشنهادی */
-        .preset-add-box {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 18px;
-        }
-        .preset-add-box input {
-            flex: 1;
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 8px 12px;
-            font-size: 12.5px;
-            outline: none;
-            transition: 0.2s;
-        }
-        .preset-add-box input:focus { border-color: var(--primary); background: #FFF; }
-        .preset-add-box button {
-            background: #3B82F6;
-            color: white;
-            border: none;
-            padding: 0 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
-        .preset-add-box button:hover { background: #2563EB; }
 
         .add-box { display: flex; gap: 8px; margin-bottom: 14px; }
         .add-box input {
@@ -238,7 +148,47 @@ HTML_TEMPLATE = """
             border-radius: 14px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        /* استایل های مربوط به لیست پیش فرض */
+        .toggle-presets-btn {
+            background: transparent;
+            border: 1px dashed #CBD5E1;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
             transition: 0.2s;
+        }
+        .toggle-presets-btn:hover { background: #F1F5F9; color: var(--primary); border-color: var(--primary); }
+        
+        .presets-container {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: none; /* پیش فرض مخفی */
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .preset-chip {
+            background: white;
+            border: 1px solid #CBD5E1;
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .preset-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .pages-list {
@@ -268,8 +218,7 @@ HTML_TEMPLATE = """
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
         }
-        .chip .del-btn { opacity: 0.6; font-size: 15px; margin-right: 4px; }
-        .chip .del-btn:hover { opacity: 1; color: #FFF; }
+        .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
 
         .time-filter {
             display: flex;
@@ -359,7 +308,7 @@ HTML_TEMPLATE = """
             margin-top: 25px;
         }
 
-        /* فوتر شیک و مینیمال */
+        /* فوتر شیک و مینیمال با لوگوی کوچک */
         .site-footer {
             margin-top: 50px;
             padding: 25px 10px;
@@ -457,7 +406,7 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <!-- هدر با لوگوی بزرگ -->
+        <!-- هدر با لوگوی بزرگ و شیک -->
         <div class="header">
             <img src="/logo.png" alt="فود یاب" class="main-logo">
             <p class="subtitle">راهنمای هوشمند کافه، رستوران و سفارش آنلاین</p>
@@ -474,27 +423,21 @@ HTML_TEMPLATE = """
 
         <div class="search-panel">
             <div id="insta-fields">
-                <!-- بخش فودبلاگرهای پیش‌فرض با امکان ویرایش -->
-                <div class="section-header">
-                    <span class="section-title">⭐ فودبلاگرهای پیشنهادی (کلیک برای افزودن به جستجو):</span>
-                    <span class="badge-count" id="presetCountBadge">0 / 15</span>
+                <span class="section-title">
+                    <span>➕ افزودن فودبلاگر جدید:</span>
+                    <button class="toggle-presets-btn" onclick="togglePresets()">🌟 بلاگرهای معروف</button>
+                </span>
+                
+                <div class="presets-container" id="presetsContainer">
+                    <!-- لیست 15 تایی پیش فرض اینجا لود میشود -->
                 </div>
 
-                <div class="preset-list" id="popularContainer"></div>
-
-                <!-- کادر افزودن به لیست پیشنهادی -->
-                <div class="preset-add-box">
-                    <input type="text" id="newPresetInput" placeholder="آیدی پیج جدید برای لیست پیشنهادی...">
-                    <button onclick="addNewPreset()">+ افزودن به پیشنهادی‌ها</button>
-                </div>
-
-                <span class="section-title">➕ افزودن دستی پیج موقت دیگر:</span>
                 <div class="add-box">
                     <input type="text" id="newPage" placeholder="مانند : dina_taster">
                     <button class="add-btn" onclick="addNewPage()">افزودن</button>
                 </div>
 
-                <span class="section-title">🎯 لیست بلاگرهای فعال شما (جهت جستجو):</span>
+                <span class="section-title">🎯 فودبلاگرهای من (قابل انتخاب و ویرایش):</span>
                 <div class="pages-list" id="pagesContainer"></div>
 
                 <span class="section-title">📅 بازه زمانی انتشار:</span>
@@ -529,279 +472,225 @@ HTML_TEMPLATE = """
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
 
-        <!-- فوتر با لوگو -->
+        <!-- فوتر مینیمال با لوگوی کوچک -->
         <footer class="site-footer">
             <img src="/logo.png" alt="فود یاب" class="footer-logo">
             <p class="footer-text">فود یاب | دستیار هوشمند کافه‌رستوران‌گردی</p>
         </footer>
     </div>
 
-    <script>
-        // لیست ۸ تایی درخواستی اولیه
-        const DEFAULT_PRESET_BLOGGERS = [
-            'mr.mrs_shekamoo',
-            'amin.nilson',
-            'khas_foood',
-            'shirazyummy',
-            'sadegh.delicious',
-            'missfoodshiraz',
-            'shiraz.taste',
-            'ali.food.travel'
-        ];
+<script>
+    let currentMode = 'insta';
+    let selectedCity = 'شیراز';
+    let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['mr.mrs_shekamoo'];
+    let selectedPages = new Set(savedPages);
+    let selectedTime = 'y';
 
-        // لود لیست پیشنهادی از حافظه مرورگر یا استفاده از پیش‌فرض ۸ تایی
-        let presetBloggers = JSON.parse(localStorage.getItem('my_preset_bloggers')) || DEFAULT_PRESET_BLOGGERS;
+    // لیست 15 تایی پیش فرض قابل ادیت توسط شما
+    const defaultBloggers = [
+        'mr.mrs_shekamoo', 'amin.nilson', 'khas_foood', 'shirazyummy', 
+        'sadegh.delicious', 'missfoodshiraz', 'shiraz.taste', 'milad_taster',
+        'food.spy.ir', 'amir_food_review', 'shekamooha', 'taster.couple',
+        'ali_food_report', 'koja_boodi', 'shiraz_food'
+    ];
 
-        let currentMode = 'insta';
-        let selectedCity = 'شیراز';
-        let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['shirazyummy', 'mr.mrs_shekamoo'];
-        let selectedPages = new Set(savedPages);
-        let selectedTime = 'y';
+    function switchMode(mode) {
+        currentMode = mode;
+        const btnInsta = document.getElementById('btn-insta');
+        const btnSnapp = document.getElementById('btn-snapp');
+        const instaFields = document.getElementById('insta-fields');
+        const snappFields = document.getElementById('snapp-fields');
+        const searchBtn = document.getElementById('mainSearchBtn');
 
-        function switchMode(mode) {
-            currentMode = mode;
-            const btnInsta = document.getElementById('btn-insta');
-            const btnSnapp = document.getElementById('btn-snapp');
-            const instaFields = document.getElementById('insta-fields');
-            const snappFields = document.getElementById('snapp-fields');
-            const searchBtn = document.getElementById('mainSearchBtn');
-
-            if (mode === 'insta') {
-                btnInsta.className = 'mode-btn active';
-                btnSnapp.className = 'mode-btn';
-                instaFields.style.display = 'block';
-                snappFields.style.display = 'none';
-                searchBtn.className = 'search-btn';
-                searchBtn.innerText = '🔍 جستجوی هوشمند در پست‌های اینستاگرام';
-            } else {
-                btnInsta.className = 'mode-btn';
-                btnSnapp.className = 'mode-btn active snapp';
-                instaFields.style.display = 'none';
-                snappFields.style.display = 'block';
-                searchBtn.className = 'search-btn snapp-btn';
-                searchBtn.innerText = '🛵 جستجو در رستوران‌ها و منوهای اسنپ‌فود';
-            }
+        if (mode === 'insta') {
+            btnInsta.className = 'mode-btn active';
+            btnSnapp.className = 'mode-btn';
+            instaFields.style.display = 'block';
+            snappFields.style.display = 'none';
+            searchBtn.className = 'search-btn';
+            searchBtn.innerText = '🔍 جستجوی هوشمند در پست‌های اینستاگرام';
+        } else {
+            btnInsta.className = 'mode-btn';
+            btnSnapp.className = 'mode-btn active snapp';
+            instaFields.style.display = 'none';
+            snappFields.style.display = 'block';
+            searchBtn.className = 'search-btn snapp-btn';
+            searchBtn.innerText = '🛵 جستجو در رستوران‌ها و منوهای اسنپ‌فود';
         }
+    }
 
-        function setCity(el, city) {
-            selectedCity = city;
-            document.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('customCity').value = '';
-        }
+    function setCity(el, city) {
+        selectedCity = city;
+        document.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('customCity').value = '';
+    }
 
-        // رندر کردن دکمه‌های پیشنهادی (با ضربدر حذف و شمارنده سقف ۱۵)
-        function renderPopularBloggers() {
-            const container = document.getElementById('popularContainer');
-            const badge = document.getElementById('presetCountBadge');
-            if (!container) return;
+    // رندر کردن بلاگرهای ذخیره شده کاربر
+    function renderChips() {
+        const container = document.getElementById('pagesContainer');
+        container.innerHTML = '';
+        savedPages.forEach(page => {
+            const isSelected = selectedPages.has(page);
+            const chip = document.createElement('div');
+            chip.className = `chip ${isSelected ? 'active' : ''}`;
+            chip.innerHTML = `
+                <span onclick="toggleSelect('${page}')">${page} ${isSelected ? '✓' : ''}</span>
+                <span class="del-btn" onclick="deletePage(event, '${page}')">×</span>
+            `;
+            container.appendChild(chip);
+        });
+        localStorage.setItem('my_food_pages', JSON.stringify(savedPages));
+        renderPresets(); // آپدیت لیست پیش فرض (برای مخفی کردن مواردی که اضافه شده اند)
+    }
 
-            container.innerHTML = '';
-            badge.innerText = `${presetBloggers.length} / 15`;
-
-            presetBloggers.forEach(handle => {
-                const isInSearchList = savedPages.includes(handle);
+    // رندر کردن لیست 15 تایی پیش فرض
+    function renderPresets() {
+        const container = document.getElementById('presetsContainer');
+        container.innerHTML = '';
+        
+        let hasAvailablePresets = false;
+        defaultBloggers.forEach(page => {
+            // اگر در لیست فعلی کاربر نیست، نمایشش بده
+            if (!savedPages.includes(page)) {
+                hasAvailablePresets = true;
                 const chip = document.createElement('div');
-                chip.className = `preset-chip ${isInSearchList ? 'in-list' : ''}`;
-                chip.innerHTML = `
-                    <span onclick="usePresetBlogger('${handle}')">${isInSearchList ? '✓' : '+'} ${handle}</span>
-                    <span class="preset-del-btn" title="حذف از لیست پیشنهادی" onclick="deletePreset(event, '${handle}')">×</span>
-                `;
+                chip.className = 'preset-chip';
+                chip.innerHTML = `+ ${page}`;
+                chip.onclick = () => addPageDirectly(page);
                 container.appendChild(chip);
-            });
-
-            localStorage.setItem('my_preset_bloggers', JSON.stringify(presetBloggers));
-        }
-
-        // افزودن پیج جدید به لیست پیشنهادی (حداکثر ۱۵ تا)
-        function addNewPreset() {
-            const input = document.getElementById('newPresetInput');
-            const val = input.value.trim().replace('@', '');
-
-            if (!val) return;
-
-            if (presetBloggers.length >= 15) {
-                alert('سقف ۱۵ فودبلاگر پیشنهادی تکمیل است. لطفاً برای افزودن مورد جدید، یکی از قبلی‌ها را با دکمه × حذف کنید.');
-                return;
             }
+        });
 
-            if (presetBloggers.includes(val)) {
-                alert('این پیج در حال حاضر در لیست پیشنهادی وجود دارد.');
-                return;
-            }
-
-            presetBloggers.push(val);
-            input.value = '';
-            renderPopularBloggers();
+        if (!hasAvailablePresets) {
+            container.innerHTML = '<span style="font-size:12px; color:gray;">همه بلاگرهای معروف به لیست شما اضافه شده‌اند!</span>';
         }
+    }
 
-        // حذف یک پیج از لیست پیشنهادی
-        function deletePreset(event, handle) {
-            event.stopPropagation();
-            presetBloggers = presetBloggers.filter(item => item !== handle);
-            renderPopularBloggers();
+    // باز و بسته کردن پنل پیش فرض ها
+    function togglePresets() {
+        const container = document.getElementById('presetsContainer');
+        if (container.style.display === 'flex') {
+            container.style.display = 'none';
+        } else {
+            container.style.display = 'flex';
         }
+    }
 
-        // کلیک روی بلاگر پیشنهادی -> اضافه شدن به لیست فعال سرچ
-        function usePresetBlogger(handle) {
-            if (!savedPages.includes(handle)) {
-                savedPages.push(handle);
-            }
-            selectedPages.add(handle);
-            renderChips();
-            renderPopularBloggers();
-        }
-
-        function renderChips() {
-            const container = document.getElementById('pagesContainer');
-            container.innerHTML = '';
-            savedPages.forEach(page => {
-                const isSelected = selectedPages.has(page);
-                const chip = document.createElement('div');
-                chip.className = `chip ${isSelected ? 'active' : ''}`;
-                chip.innerHTML = `
-                    <span onclick="toggleSelect('${page}')">${page} ${isSelected ? '✓' : ''}</span>
-                    <span class="del-btn" onclick="deletePage(event, '${page}')">×</span>
-                `;
-                container.appendChild(chip);
-            });
-            localStorage.setItem('my_food_pages', JSON.stringify(savedPages));
-        }
-
-        function toggleSelect(page) {
-            if (selectedPages.has(page)) selectedPages.delete(page);
-            else selectedPages.add(page);
-            renderChips();
-        }
-
-        function addNewPage() {
-            const input = document.getElementById('newPage');
-            const val = input.value.trim().replace('@', '');
-            if (val && !savedPages.includes(val)) {
-                savedPages.push(val);
-                selectedPages.add(val);
-                input.value = '';
-                renderChips();
-                renderPopularBloggers();
-            }
-        }
-
-        function deletePage(event, page) {
-            event.stopPropagation();
-            savedPages = savedPages.filter(p => p !== page);
-            selectedPages.delete(page);
-            renderChips();
-            renderPopularBloggers();
-        }
-
-        function setTime(timeType) {
-            selectedTime = timeType;
-            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`time-${timeType}`).classList.add('active');
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') executeSmartSearch();
-        }
-
-        function unlockGoogleScrollTrap() {
-            let attempts = 0;
-            const interval = setInterval(() => {
-                attempts++;
-                document.documentElement.style.setProperty('overflow', 'visible', 'important');
-                document.body.style.setProperty('overflow', 'visible', 'important');
-                document.body.classList.remove('gsc-overflow-hidden');
-
-                const modal = document.querySelector('.gsc-modal-background-image');
-                if (modal) modal.remove();
-
-                const overlay = document.querySelector('.gsc-results-wrapper-overlay');
-                if (overlay) {
-                    overlay.style.setProperty('position', 'static', 'important');
-                    overlay.style.setProperty('height', 'auto', 'important');
-                    overlay.style.setProperty('overflow', 'visible', 'important');
-                }
-
-                document.querySelectorAll('#resultsWrapper a[href*="google.com/search"], .gsc-results-search-on-google').forEach(el => {
-                    el.remove();
-                });
-
-                if (attempts > 30) clearInterval(interval);
-            }, 100);
-        }
-
-        // باز کردن لینک‌ها مستقیماً داخل اپلیکیشن اینستاگرام موبایل برای جلوگیری از صفحه لاگین
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('#resultsWrapper a');
-            if (!link) return;
-
-            const url = link.href;
-            if (url && url.includes('instagram.com')) {
-                // اگر کاربر با گوشی موبایل است
-                if (/Android/i.test(navigator.userAgent)) {
-                    e.preventDefault();
-                    const path = url.replace(/^https?:\/\/(www\.)?instagram\.com\//, '');
-                    window.location.href = `intent://instagram.com/${path}#Intent;package=com.instagram.android;scheme=https;end`;
-                } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                    e.preventDefault();
-                    window.location.href = url;
-                }
-            }
-        }, true);
-
-        function executeSmartSearch() {
-            const food = document.getElementById('food').value.trim();
-            if (!food) {
-                alert('لطفاً نام غذا را بنویسید!');
-                return;
-            }
-
-            let finalQuery = '';
-
-            if (currentMode === 'insta') {
-                if (selectedPages.size === 0) {
-                    alert('لطفاً حداقل یک پیج فودبلاگر را انتخاب کنید!');
-                    return;
-                }
-                const pagesArray = Array.from(selectedPages);
-                const pagesQuery = pagesArray.length === 1 ? `"${pagesArray[0]}"` : '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
-
-                let dateFilter = '';
-                const now = new Date();
-                if (selectedTime === 'm') {
-                    const d = new Date(new Date().setDate(now.getDate() - 30));
-                    dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                } else if (selectedTime === 'y') {
-                    const d = new Date(new Date().setFullYear(now.getFullYear() - 1));
-                    dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                }
-
-                // تمرکز فقط روی پست‌ها و ریلزها به جای پروفایل برای رفع مشکل صفحه لاگین
-                finalQuery = `(site:instagram.com/p/ OR site:instagram.com/reel/) ${pagesQuery} ${food} ${dateFilter}`.trim();
-            } else {
-                const customCity = document.getElementById('customCity').value.trim();
-                const city = customCity ? customCity : selectedCity;
-                finalQuery = `site:snappfood.ir "${city}" ${food}`.trim();
-            }
-
-            const element = google.search.cse.element.getElement('foodyab_results');
-            if (element) {
-                element.execute(finalQuery);
-                unlockGoogleScrollTrap();
-
-                setTimeout(() => {
-                    const resultsEl = document.getElementById('resultsWrapper');
-                    if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 600);
-            } else {
-                alert('در حال بارگذاری موتور جستجو... لطفاً دوباره دکمه را بزنید.');
-            }
-        }
-
-        // رندرهای ابتدایی صفحه
+    function toggleSelect(page) {
+        if (selectedPages.has(page)) selectedPages.delete(page);
+        else selectedPages.add(page);
         renderChips();
-        renderPopularBloggers();
-    </script>
+    }
+
+    function addPageDirectly(val) {
+        if (val && !savedPages.includes(val)) {
+            savedPages.push(val);
+            selectedPages.add(val);
+            renderChips();
+        }
+    }
+
+    function addNewPage() {
+        const input = document.getElementById('newPage');
+        const val = input.value.trim().replace('@', '');
+        addPageDirectly(val);
+        input.value = '';
+    }
+
+    function deletePage(event, page) {
+        event.stopPropagation();
+        savedPages = savedPages.filter(p => p !== page);
+        selectedPages.delete(page);
+        renderChips();
+    }
+
+    function setTime(timeType) {
+        selectedTime = timeType;
+        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`time-${timeType}`).classList.add('active');
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') executeSmartSearch();
+    }
+
+    function unlockGoogleScrollTrap() {
+        let attempts = 0;
+        const interval = setInterval(() => {
+            attempts++;
+            document.documentElement.style.setProperty('overflow', 'visible', 'important');
+            document.body.style.setProperty('overflow', 'visible', 'important');
+            document.body.classList.remove('gsc-overflow-hidden');
+
+            const modal = document.querySelector('.gsc-modal-background-image');
+            if (modal) modal.remove();
+
+            const overlay = document.querySelector('.gsc-results-wrapper-overlay');
+            if (overlay) {
+                overlay.style.setProperty('position', 'static', 'important');
+                overlay.style.setProperty('height', 'auto', 'important');
+                overlay.style.setProperty('overflow', 'visible', 'important');
+            }
+
+            document.querySelectorAll('#resultsWrapper a[href*="google.com/search"], .gsc-results-search-on-google').forEach(el => {
+                el.remove();
+            });
+
+            if (attempts > 30) clearInterval(interval);
+        }, 100);
+    }
+
+    function executeSmartSearch() {
+        const food = document.getElementById('food').value.trim();
+        if (!food) {
+            alert('لطفاً نام غذا را بنویسید!');
+            return;
+        }
+
+        let finalQuery = '';
+
+        if (currentMode === 'insta') {
+            if (selectedPages.size === 0) {
+                alert('لطفاً حداقل یک پیج فودبلاگر را انتخاب کنید!');
+                return;
+            }
+            const pagesArray = Array.from(selectedPages);
+            const pagesQuery = pagesArray.length === 1 ? `"${pagesArray[0]}"` : '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
+
+            let dateFilter = '';
+            const now = new Date();
+            if (selectedTime === 'm') {
+                const d = new Date(new Date().setDate(now.getDate() - 30));
+                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            } else if (selectedTime === 'y') {
+                const d = new Date(new Date().setFullYear(now.getFullYear() - 1));
+                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            }
+
+            finalQuery = `site:instagram.com ${pagesQuery} ${food} ${dateFilter}`.trim();
+        } else {
+            const customCity = document.getElementById('customCity').value.trim();
+            const city = customCity ? customCity : selectedCity;
+            finalQuery = `site:snappfood.ir "${city}" ${food}`.trim();
+        }
+
+        const element = google.search.cse.element.getElement('foodyab_results');
+        if (element) {
+            element.execute(finalQuery);
+            unlockGoogleScrollTrap();
+
+            setTimeout(() => {
+                const resultsEl = document.getElementById('resultsWrapper');
+                if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 600);
+        } else {
+            alert('در حال بارگذاری موتور جستجو... لطفاً دوباره دکمه را بزنید.');
+        }
+    }
+
+    renderChips(); // لود اولیه
+</script>
 </body>
 </html>
 """
