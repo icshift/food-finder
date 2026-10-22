@@ -125,6 +125,39 @@ HTML_TEMPLATE = """
             display: block;
         }
 
+        /* بخش بلاگرهای پیشنهادی */
+        .preset-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .preset-chip {
+            background: #FFFFFF;
+            border: 1px dashed #CBD5E1;
+            color: #475569;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .preset-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #FFF5F5;
+            transform: translateY(-1px);
+        }
+        .preset-chip.already-added {
+            background: #ECFDF5;
+            border: 1px solid #10B981;
+            color: #059669;
+            font-weight: 600;
+        }
+
         .add-box { display: flex; gap: 8px; margin-bottom: 14px; }
         .add-box input {
             flex: 1;
@@ -146,7 +179,9 @@ HTML_TEMPLATE = """
             border-radius: 14px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .add-btn:active { transform: scale(0.96); }
 
         .pages-list {
             display: flex;
@@ -167,6 +202,7 @@ HTML_TEMPLATE = """
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: 0.2s;
         }
         .chip.active {
             background: var(--primary-gradient);
@@ -175,7 +211,8 @@ HTML_TEMPLATE = """
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
         }
-        .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
+        .chip .del-btn { opacity: 0.6; font-size: 15px; margin-right: 4px; }
+        .chip .del-btn:hover { opacity: 1; color: #FFF; }
 
         .time-filter {
             display: flex;
@@ -265,7 +302,7 @@ HTML_TEMPLATE = """
             margin-top: 25px;
         }
 
-        /* فوتر شیک و مینیمال با لوگوی کوچک */
+        /* فوتر شیک و مینیمال */
         .site-footer {
             margin-top: 50px;
             padding: 25px 10px;
@@ -363,7 +400,7 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <!-- هدر با لوگوی بزرگ و شیک -->
+        <!-- هدر با لوگوی بزرگ -->
         <div class="header">
             <img src="/logo.png" alt="فود یاب" class="main-logo">
             <p class="subtitle">راهنمای هوشمند کافه، رستوران و سفارش آنلاین</p>
@@ -380,13 +417,17 @@ HTML_TEMPLATE = """
 
         <div class="search-panel">
             <div id="insta-fields">
-                <span class="section-title">➕ افزودن فودبلاگر جدید:</span>
+                <!-- لیست پیش‌فرض بلاگرهای معروف -->
+                <span class="section-title">⭐ فودبلاگرهای معروف و پیشنهادی (کلیک برای افزودن):</span>
+                <div class="preset-list" id="popularContainer"></div>
+
+                <span class="section-title">➕ افزودن فودبلاگر جدید دلخواه:</span>
                 <div class="add-box">
                     <input type="text" id="newPage" placeholder="مانند : dina_taster">
                     <button class="add-btn" onclick="addNewPage()">افزودن</button>
                 </div>
 
-                <span class="section-title">🎯 انتخاب فودبلاگرها (همزمان):</span>
+                <span class="section-title">🎯 لیست بلاگرهای فعال شما (قابل انتخاب همزمان):</span>
                 <div class="pages-list" id="pagesContainer"></div>
 
                 <span class="section-title">📅 بازه زمانی انتشار:</span>
@@ -421,7 +462,7 @@ HTML_TEMPLATE = """
             <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
         </div>
 
-        <!-- فوتر مینیمال با لوگوی کوچک -->
+        <!-- فوتر با لوگو -->
         <footer class="site-footer">
             <img src="/logo.png" alt="فود یاب" class="footer-logo">
             <p class="footer-text">فود یاب | دستیار هوشمند کافه‌رستوران‌گردی</p>
@@ -429,10 +470,24 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
+        // لیست بلاگرهای پیشنهادی و معروف (نام نمایشی و آیدی پیج)
+        const FAMOUS_BLOGGERS = [
+            { title: 'مستر تیستر', id: 'mr.taster' },
+            { title: 'میلاد تیستر', id: 'milad_taster' },
+            { title: 'علی فودباز', id: 'ali_foodbaz' },
+            { title: 'امیر جابری', id: 'amir_jaberi' },
+            { title: 'شیراز یامی', id: 'shirazyummy' },
+            { title: 'عمو روحی', id: 'amoo_roohi_fooddoost' },
+            { title: 'فرهادپز', id: 'farhadpaz' },
+            { title: 'کیمیا تیستر', id: 'kimiaytaster' },
+            { title: 'دیبا تیستر', id: 'diba_taster' },
+            { title: 'لقمه', id: 'loghme_' }
+        ];
+
         let currentMode = 'insta';
         let selectedCity = 'شیراز';
-        let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['شیراز یامی', 'milad_taster'];
-        let selectedPages = new Set(['شیراز یامی']);
+        let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['shirazyummy', 'milad_taster'];
+        let selectedPages = new Set(savedPages);
         let selectedTime = 'y';
 
         function switchMode(mode) {
@@ -467,6 +522,35 @@ HTML_TEMPLATE = """
             document.getElementById('customCity').value = '';
         }
 
+        // رندر کردن دکمه‌های بلاگرهای پیشنهادی
+        function renderPopularBloggers() {
+            const container = document.getElementById('popularContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            FAMOUS_BLOGGERS.forEach(blogger => {
+                const isAdded = savedPages.includes(blogger.id);
+                const chip = document.createElement('div');
+                chip.className = `preset-chip ${isAdded ? 'already-added' : ''}`;
+                chip.innerHTML = isAdded 
+                    ? `✓ ${blogger.title}`
+                    : `+ ${blogger.title}`;
+                chip.title = `@${blogger.id}`;
+                chip.onclick = () => addPopularBlogger(blogger.id);
+                container.appendChild(chip);
+            });
+        }
+
+        // اضافه کردن بلاگر پیشنهادی با کلیک
+        function addPopularBlogger(pageId) {
+            if (!savedPages.includes(pageId)) {
+                savedPages.push(pageId);
+            }
+            selectedPages.add(pageId);
+            renderChips();
+            renderPopularBloggers();
+        }
+
         function renderChips() {
             const container = document.getElementById('pagesContainer');
             container.innerHTML = '';
@@ -497,6 +581,7 @@ HTML_TEMPLATE = """
                 selectedPages.add(val);
                 input.value = '';
                 renderChips();
+                renderPopularBloggers();
             }
         }
 
@@ -505,6 +590,7 @@ HTML_TEMPLATE = """
             savedPages = savedPages.filter(p => p !== page);
             selectedPages.delete(page);
             renderChips();
+            renderPopularBloggers();
         }
 
         function setTime(timeType) {
@@ -591,7 +677,9 @@ HTML_TEMPLATE = """
             }
         }
 
+        // مقداردهی اولیه
         renderChips();
+        renderPopularBloggers();
     </script>
 </body>
 </html>
