@@ -117,46 +117,105 @@ HTML_TEMPLATE = """
             margin-bottom: 25px;
         }
 
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
         .section-title {
             font-size: 13px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 8px;
             display: block;
         }
 
-        /* بخش بلاگرهای پیشنهادی */
+        .badge-count {
+            font-size: 11px;
+            background: #E2E8F0;
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* استایل لیست فودبلاگرهای پیشنهادی قابل ویرایش */
         .preset-list {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
         .preset-chip {
             background: #FFFFFF;
-            border: 1px dashed #CBD5E1;
-            color: #475569;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
+            border: 1.5px dashed #CBD5E1;
+            color: #334155;
+            padding: 6px 10px 6px 12px;
+            border-radius: 14px;
+            font-size: 12.5px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
         .preset-chip:hover {
             border-color: var(--primary);
             color: var(--primary);
             background: #FFF5F5;
-            transform: translateY(-1px);
         }
-        .preset-chip.already-added {
-            background: #ECFDF5;
-            border: 1px solid #10B981;
+        .preset-chip.in-list {
+            border-style: solid;
+            border-color: #10B981;
             color: #059669;
+            background: #ECFDF5;
             font-weight: 600;
         }
+        .preset-del-btn {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-right: 4px;
+            line-height: 1;
+            border-radius: 50%;
+            padding: 2px;
+            transition: 0.2s;
+        }
+        .preset-del-btn:hover {
+            color: #EF4444;
+            background: #FEE2E2;
+        }
+
+        /* باکس افزودن به لیست پیشنهادی */
+        .preset-add-box {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+        .preset-add-box input {
+            flex: 1;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 12.5px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .preset-add-box input:focus { border-color: var(--primary); background: #FFF; }
+        .preset-add-box button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 0 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .preset-add-box button:hover { background: #2563EB; }
 
         .add-box { display: flex; gap: 8px; margin-bottom: 14px; }
         .add-box input {
@@ -181,7 +240,6 @@ HTML_TEMPLATE = """
             cursor: pointer;
             transition: 0.2s;
         }
-        .add-btn:active { transform: scale(0.96); }
 
         .pages-list {
             display: flex;
@@ -202,7 +260,6 @@ HTML_TEMPLATE = """
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: 0.2s;
         }
         .chip.active {
             background: var(--primary-gradient);
@@ -417,17 +474,27 @@ HTML_TEMPLATE = """
 
         <div class="search-panel">
             <div id="insta-fields">
-                <!-- لیست پیش‌فرض بلاگرهای معروف -->
-                <span class="section-title">⭐ فودبلاگرهای معروف و پیشنهادی (کلیک برای افزودن):</span>
+                <!-- بخش فودبلاگرهای پیش‌فرض با امکان ویرایش -->
+                <div class="section-header">
+                    <span class="section-title">⭐ فودبلاگرهای پیشنهادی (کلیک برای افزودن به جستجو):</span>
+                    <span class="badge-count" id="presetCountBadge">0 / 15</span>
+                </div>
+
                 <div class="preset-list" id="popularContainer"></div>
 
-                <span class="section-title">➕ افزودن فودبلاگر جدید دلخواه:</span>
+                <!-- کادر افزودن به لیست پیشنهادی -->
+                <div class="preset-add-box">
+                    <input type="text" id="newPresetInput" placeholder="آیدی پیج جدید برای لیست پیشنهادی...">
+                    <button onclick="addNewPreset()">+ افزودن به پیشنهادی‌ها</button>
+                </div>
+
+                <span class="section-title">➕ افزودن دستی پیج موقت دیگر:</span>
                 <div class="add-box">
                     <input type="text" id="newPage" placeholder="مانند : dina_taster">
                     <button class="add-btn" onclick="addNewPage()">افزودن</button>
                 </div>
 
-                <span class="section-title">🎯 لیست بلاگرهای فعال شما (قابل انتخاب همزمان):</span>
+                <span class="section-title">🎯 لیست بلاگرهای فعال شما (جهت جستجو):</span>
                 <div class="pages-list" id="pagesContainer"></div>
 
                 <span class="section-title">📅 بازه زمانی انتشار:</span>
@@ -470,23 +537,24 @@ HTML_TEMPLATE = """
     </div>
 
     <script>
-        // لیست بلاگرهای پیشنهادی و معروف (نام نمایشی و آیدی پیج)
-        const FAMOUS_BLOGGERS = [
-            { title: 'مستر تیستر', id: 'mr.taster' },
-            { title: 'میلاد تیستر', id: 'milad_taster' },
-            { title: 'علی فودباز', id: 'ali_foodbaz' },
-            { title: 'امیر جابری', id: 'amir_jaberi' },
-            { title: 'شیراز یامی', id: 'shirazyummy' },
-            { title: 'عمو روحی', id: 'amoo_roohi_fooddoost' },
-            { title: 'فرهادپز', id: 'farhadpaz' },
-            { title: 'کیمیا تیستر', id: 'kimiaytaster' },
-            { title: 'دیبا تیستر', id: 'diba_taster' },
-            { title: 'لقمه', id: 'loghme_' }
+        // لیست ۸ تایی درخواستی اولیه
+        const DEFAULT_PRESET_BLOGGERS = [
+            'mr.mrs_shekamoo',
+            'amin.nilson',
+            'khas_foood',
+            'shirazyummy',
+            'sadegh.delicious',
+            'missfoodshiraz',
+            'shiraz.taste',
+            'ali.food.travel'
         ];
+
+        // لود لیست پیشنهادی از localStorage یا استفاده از ۸ تای اول
+        let presetBloggers = JSON.parse(localStorage.getItem('my_preset_bloggers')) || DEFAULT_PRESET_BLOGGERS;
 
         let currentMode = 'insta';
         let selectedCity = 'شیراز';
-        let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['shirazyummy', 'milad_taster'];
+        let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['shirazyummy', 'mr.mrs_shekamoo'];
         let selectedPages = new Set(savedPages);
         let selectedTime = 'y';
 
@@ -522,31 +590,64 @@ HTML_TEMPLATE = """
             document.getElementById('customCity').value = '';
         }
 
-        // رندر کردن دکمه‌های بلاگرهای پیشنهادی
+        // رندر کردن دکمه‌های پیشنهادی (با ضربدر حذف و شمارنده سقف ۱۵)
         function renderPopularBloggers() {
             const container = document.getElementById('popularContainer');
+            const badge = document.getElementById('presetCountBadge');
             if (!container) return;
+
             container.innerHTML = '';
-            
-            FAMOUS_BLOGGERS.forEach(blogger => {
-                const isAdded = savedPages.includes(blogger.id);
+            badge.innerText = `${presetBloggers.length} / 15`;
+
+            presetBloggers.forEach(handle => {
+                const isInSearchList = savedPages.includes(handle);
                 const chip = document.createElement('div');
-                chip.className = `preset-chip ${isAdded ? 'already-added' : ''}`;
-                chip.innerHTML = isAdded 
-                    ? `✓ ${blogger.title}`
-                    : `+ ${blogger.title}`;
-                chip.title = `@${blogger.id}`;
-                chip.onclick = () => addPopularBlogger(blogger.id);
+                chip.className = `preset-chip ${isInSearchList ? 'in-list' : ''}`;
+                chip.innerHTML = `
+                    <span onclick="usePresetBlogger('${handle}')">${isInSearchList ? '✓' : '+'} ${handle}</span>
+                    <span class="preset-del-btn" title="حذف از لیست پیشنهادی" onclick="deletePreset(event, '${handle}')">×</span>
+                `;
                 container.appendChild(chip);
             });
+
+            localStorage.setItem('my_preset_bloggers', JSON.stringify(presetBloggers));
         }
 
-        // اضافه کردن بلاگر پیشنهادی با کلیک
-        function addPopularBlogger(pageId) {
-            if (!savedPages.includes(pageId)) {
-                savedPages.push(pageId);
+        // افزودن پیج جدید به لیست پیشنهادی (حداکثر ۱۵ تا)
+        function addNewPreset() {
+            const input = document.getElementById('newPresetInput');
+            const val = input.value.trim().replace('@', '');
+
+            if (!val) return;
+
+            if (presetBloggers.length >= 15) {
+                alert('سقف ۱۵ فودبلاگر پیشنهادی پر شده است. لطفاً برای اضافه کردن، یکی از موارد قبلی را با ضربدر حذف کنید.');
+                return;
             }
-            selectedPages.add(pageId);
+
+            if (presetBloggers.includes(val)) {
+                alert('این پیج در حال حاضر در لیست پیشنهادی وجود دارد.');
+                return;
+            }
+
+            presetBloggers.push(val);
+            input.value = '';
+            renderPopularBloggers();
+        }
+
+        // حذف یک پیج از لیست پیشنهادی
+        function deletePreset(event, handle) {
+            event.stopPropagation();
+            presetBloggers = presetBloggers.filter(item => item !== handle);
+            renderPopularBloggers();
+        }
+
+        // کلیک روی بلاگر پیشنهادی -> اضافه شدن به لیست فعال سرچ
+        function usePresetBlogger(handle) {
+            if (!savedPages.includes(handle)) {
+                savedPages.push(handle);
+            }
+            selectedPages.add(handle);
             renderChips();
             renderPopularBloggers();
         }
@@ -677,7 +778,7 @@ HTML_TEMPLATE = """
             }
         }
 
-        // مقداردهی اولیه
+        // رندرهای ابتدایی
         renderChips();
         renderPopularBloggers();
     </script>
