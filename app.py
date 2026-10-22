@@ -549,7 +549,7 @@ HTML_TEMPLATE = """
             'ali.food.travel'
         ];
 
-        // لود لیست پیشنهادی از localStorage یا استفاده از ۸ تای اول
+        // لود لیست پیشنهادی از حافظه مرورگر یا استفاده از پیش‌فرض ۸ تایی
         let presetBloggers = JSON.parse(localStorage.getItem('my_preset_bloggers')) || DEFAULT_PRESET_BLOGGERS;
 
         let currentMode = 'insta';
@@ -621,7 +621,7 @@ HTML_TEMPLATE = """
             if (!val) return;
 
             if (presetBloggers.length >= 15) {
-                alert('سقف ۱۵ فودبلاگر پیشنهادی پر شده است. لطفاً برای اضافه کردن، یکی از موارد قبلی را با ضربدر حذف کنید.');
+                alert('سقف ۱۵ فودبلاگر پیشنهادی تکمیل است. لطفاً برای افزودن مورد جدید، یکی از قبلی‌ها را با دکمه × حذف کنید.');
                 return;
             }
 
@@ -730,6 +730,25 @@ HTML_TEMPLATE = """
             }, 100);
         }
 
+        // باز کردن لینک‌ها مستقیماً داخل اپلیکیشن اینستاگرام موبایل برای جلوگیری از صفحه لاگین
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('#resultsWrapper a');
+            if (!link) return;
+
+            const url = link.href;
+            if (url && url.includes('instagram.com')) {
+                // اگر کاربر با گوشی موبایل است
+                if (/Android/i.test(navigator.userAgent)) {
+                    e.preventDefault();
+                    const path = url.replace(/^https?:\/\/(www\.)?instagram\.com\//, '');
+                    window.location.href = `intent://instagram.com/${path}#Intent;package=com.instagram.android;scheme=https;end`;
+                } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    e.preventDefault();
+                    window.location.href = url;
+                }
+            }
+        }, true);
+
         function executeSmartSearch() {
             const food = document.getElementById('food').value.trim();
             if (!food) {
@@ -757,7 +776,8 @@ HTML_TEMPLATE = """
                     dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                 }
 
-                finalQuery = `site:instagram.com ${pagesQuery} ${food} ${dateFilter}`.trim();
+                // تمرکز فقط روی پست‌ها و ریلزها به جای پروفایل برای رفع مشکل صفحه لاگین
+                finalQuery = `(site:instagram.com/p/ OR site:instagram.com/reel/) ${pagesQuery} ${food} ${dateFilter}`.trim();
             } else {
                 const customCity = document.getElementById('customCity').value.trim();
                 const city = customCity ? customCity : selectedCity;
@@ -778,7 +798,7 @@ HTML_TEMPLATE = """
             }
         }
 
-        // رندرهای ابتدایی
+        // رندرهای ابتدایی صفحه
         renderChips();
         renderPopularBloggers();
     </script>
