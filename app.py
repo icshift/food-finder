@@ -489,8 +489,8 @@ HTML_TEMPLATE = """
     // لیست 15 تایی پیش فرض قابل ادیت توسط شما
     const defaultBloggers = [
         'mr.mrs_shekamoo', 'amin.nilson', 'khas_foood', 'shirazyummy', 
-        'sadegh.delicious', 'missfoodshiraz', 'ali_food_report', '',
-        '', '', '', '',
+        'sadegh.delicious', 'missfoodshiraz', 'ali_food_report', 'mr.foodshz',
+        'afshin.lashkari', '', '', '',
         '', '', ''
     ];
 
