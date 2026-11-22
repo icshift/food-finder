@@ -14,7 +14,14 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#FF4757">
+    <link rel="icon" type="image/png" href="/logo.png">
     <title>فود یاب | موتور هوشمند جستجوی خوراک</title>
+
+    <!-- فونت مدرن وزیرمتن -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- اسکریپت رسمی گوگل اختصاصی شما -->
     <script async src="https://cse.google.com/cse.js?cx=50ace54d7326e4e0d"></script>
@@ -22,17 +29,30 @@ HTML_TEMPLATE = """
     <style>
         :root {
             --primary: #FF4757;
-            --primary-gradient: linear-gradient(135deg, #FF4757 0%, #FF6B81 50%, #FFA502 100%);
+            --primary-soft: rgba(255, 71, 87, 0.1);
+            --primary-gradient: linear-gradient(135deg, #FF4757 0%, #FF6B81 55%, #FF8C42 100%);
+            --insta-gradient: linear-gradient(135deg, #E1306C 0%, #FD1D1D 50%, #F77737 100%);
             --snapp-color: #FA0050;
-            --bg-light: #F8F9FA;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --card-border: rgba(0, 0, 0, 0.08);
-            --text-main: #1E293B;
+            --snapp-gradient: linear-gradient(135deg, #FA0050 0%, #FF2E79 100%);
+            --bg-main: #F8FAFC;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --border-color: #E2E8F0;
+            --text-main: #0F172A;
+            --text-secondary: #475569;
             --text-muted: #64748B;
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
         }
 
-        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
-        
+        * {
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         html, body {
             overflow-x: hidden !important;
             overflow-y: visible !important;
@@ -43,143 +63,329 @@ HTML_TEMPLATE = """
         }
 
         body {
-            background-color: #F8FAF8;
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(255, 71, 87, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 20%, rgba(255, 165, 2, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 50% 90%, rgba(250, 0, 80, 0.06) 0%, transparent 50%),
-                linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+            background-color: var(--bg-main);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(255, 71, 87, 0.09) 0px, transparent 50%),
+                radial-gradient(at 100% 10%, rgba(255, 165, 2, 0.10) 0px, transparent 45%),
+                radial-gradient(at 50% 100%, rgba(250, 0, 80, 0.06) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text-main);
-            padding: 20px 15px 60px 15px;
+            padding: 18px 14px 50px 14px;
             display: flex;
             justify-content: center;
         }
 
-        .container { width: 100%; max-width: 680px; }
-
-        /* هدر به همراه لوگوی اصلی */
-        .header { text-align: center; margin-bottom: 22px; }
-        .main-logo {
-            width: 125px;
-            height: 125px;
-            object-fit: cover;
-            border-radius: 28px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            margin-bottom: 12px;
-            transition: transform 0.3s;
+        .container {
+            width: 100%;
+            max-width: 660px;
         }
-        .main-logo:hover { transform: scale(1.03); }
-        
-        p.subtitle { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
-        .mode-switch {
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #1E293B;
+            color: #FFFFFF;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* هدر جمع‌وجور و مدرن */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding: 4px 0;
+        }
+        .logo-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .main-logo {
+            width: 68px;
+            height: 68px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.16);
+            border: 2.5px solid #FFFFFF;
+            display: block;
+            background: #FFF;
+        }
+        .header-text {
+            text-align: right;
+        }
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+        .brand-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand-badge {
+            font-size: 10px;
+            font-weight: 700;
+            background: var(--primary-soft);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 99px;
+        }
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* سوییچ حالت اینستاگرام / اسنپ‌فود */
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             background: #E2E8F0;
             padding: 5px;
-            border-radius: 20px;
-            margin-bottom: 20px;
+            border-radius: 18px;
+            margin-bottom: 16px;
             gap: 6px;
         }
         .mode-btn {
-            flex: 1;
+            border: none;
+            background: transparent;
             text-align: center;
-            padding: 12px 10px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 16px;
+            padding: 11px 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: 14px;
             cursor: pointer;
-            color: var(--text-muted);
-            transition: 0.25s;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
+        .mode-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
         .mode-btn.active {
-            background: white;
+            background: #FFFFFF;
             color: var(--text-main);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
         }
-        .mode-btn.active.snapp {
-            color: var(--snapp-color);
-        }
+        .mode-btn.active.insta { color: #E1306C; }
+        .mode-btn.active.snapp { color: var(--snapp-color); }
 
+        /* پنل اصلی جستجو */
         .search-panel {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 24px;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06);
-            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.6);
+            margin-bottom: 22px;
         }
 
+        /* باکس اصلی جستجوی غذا (در اولویت بالا) */
+        .food-search-box {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .food-input {
+            width: 100%;
+            background: #F8FAFC;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 14px 44px 14px 40px;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .food-input::placeholder {
+            color: #94A3B8;
+            font-weight: 400;
+        }
+        .food-input:focus {
+            border-color: var(--primary);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.12);
+        }
+        body.snapp-mode .food-input:focus {
+            border-color: var(--snapp-color);
+            box-shadow: 0 0 0 4px rgba(250, 0, 80, 0.12);
+        }
+        .search-icon-right {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            pointer-events: none;
+            display: flex;
+        }
+        .clear-input-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: #E2E8F0;
+            color: #475569;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .clear-input-btn.visible { display: flex; }
+
+        /* چیپ‌های پیشنهاد سریع غذا */
+        .quick-foods {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 18px;
+            scrollbar-width: none;
+        }
+        .quick-foods::-webkit-scrollbar { display: none; }
+        .quick-food-tag {
+            flex-shrink: 0;
+            background: #F1F5F9;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 5px 11px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .quick-food-tag:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: rgba(255, 71, 87, 0.25);
+        }
+
+        .divider {
+            height: 1px;
+            background: #F1F5F9;
+            margin: 14px 0 16px 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
         .section-title {
             font-size: 13px;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 8px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-
-        .add-box { display: flex; gap: 8px; margin-bottom: 14px; }
-        .add-box input {
-            flex: 1;
-            background: #F8FAFC;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 14px;
-            padding: 12px 14px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            transition: 0.2s;
-        }
-        .add-box input:focus { border-color: var(--primary); background: white; }
-        .add-btn {
-            background: #10B981;
-            color: white;
-            border: none;
-            padding: 0 18px;
-            border-radius: 14px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* استایل های مربوط به لیست پیش فرض */
-        .toggle-presets-btn {
-            background: transparent;
-            border: 1px dashed #CBD5E1;
-            color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .toggle-presets-btn:hover { background: #F1F5F9; color: var(--primary); border-color: var(--primary); }
-        
-        .presets-container {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 15px;
-            display: none; /* پیش فرض مخفی */
-            flex-wrap: wrap;
             gap: 6px;
         }
-        .preset-chip {
-            background: white;
-            border: 1px solid #CBD5E1;
+        .count-badge {
+            background: #F1F5F9;
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-weight: 700;
+        }
+        .mini-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .text-btn {
+            background: transparent;
+            border: none;
             color: var(--text-muted);
-            padding: 5px 10px;
-            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 7px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .text-btn:hover { background: #F1F5F9; color: var(--primary); }
+
+        .toggle-presets-btn {
+            background: #FFF7ED;
+            border: 1px solid #FFEDD5;
+            color: #EA580C;
+            padding: 5px 11px;
+            border-radius: 10px;
             font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .toggle-presets-btn:hover {
+            background: #FFEDD5;
+        }
+
+        /* پنل بلاگرهای معروف */
+        .presets-container {
+            background: #F8FAFC;
+            border: 1px dashed #CBD5E1;
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            margin-bottom: 14px;
+            display: none;
+            flex-wrap: wrap;
+            gap: 7px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .preset-chip {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 11px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
@@ -189,129 +395,228 @@ HTML_TEMPLATE = """
         .preset-chip:hover {
             border-color: var(--primary);
             color: var(--primary);
+            background: #FFF5F5;
         }
 
+        /* افزودن بلاگر / شهر */
+        .add-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .add-box input {
+            flex: 1;
+            min-width: 0;
+            background: #F8FAFC;
+            border: 1.5px solid var(--border-color);
+            border-radius: 13px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .add-box input:focus {
+            border-color: var(--primary);
+            background: #FFFFFF;
+        }
+        .add-btn {
+            background: #0F172A;
+            color: #FFFFFF;
+            border: none;
+            padding: 0 16px;
+            border-radius: 13px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .add-btn:hover { background: #1E293B; }
+
+        /* لیست چیپ‌های بلاگرهای انتخابی */
         .pages-list {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 18px;
-            max-height: 120px;
+            max-height: 135px;
             overflow-y: auto;
+            padding: 2px;
         }
         .chip {
             background: #F1F5F9;
-            border: 1px solid #E2E8F0;
-            color: var(--text-main);
-            padding: 7px 14px;
-            border-radius: 20px;
-            font-size: 13px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            font-weight: 600;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
         }
+        .chip:hover { border-color: #CBD5E1; }
         .chip.active {
-            background: var(--primary-gradient);
-            color: white;
+            background: var(--insta-gradient);
+            color: #FFFFFF;
             border-color: transparent;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.28);
         }
-        .chip .del-btn { opacity: 0.6; font-size: 14px; margin-right: 4px; }
+        .chip .del-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: 0.15s;
+        }
+        .chip .del-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+            opacity: 1;
+        }
 
+        /* فیلتر زمانی */
         .time-filter {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             background: #F1F5F9;
             padding: 4px;
-            border-radius: 14px;
+            border-radius: 13px;
             margin-bottom: 18px;
             gap: 4px;
         }
         .time-btn {
-            flex: 1;
             text-align: center;
             padding: 8px 6px;
-            font-size: 13px;
+            font-size: 12.5px;
+            font-weight: 600;
             border-radius: 10px;
             cursor: pointer;
             color: var(--text-muted);
+            transition: 0.2s;
         }
         .time-btn.active {
-            background: white;
+            background: #FFFFFF;
             color: var(--primary);
-            font-weight: bold;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
         }
 
+        /* انتخاب شهر در اسنپ‌فود */
         .city-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         .city-chip {
             background: #F1F5F9;
-            border: 1px solid #E2E8F0;
-            padding: 6px 14px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 7px 14px;
             border-radius: 12px;
             font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 500;
+            transition: 0.2s;
         }
         .city-chip.active {
             background: var(--snapp-color);
-            color: white;
+            color: #FFFFFF;
             border-color: var(--snapp-color);
-            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(250, 0, 80, 0.25);
         }
 
-        .food-input {
-            width: 100%;
-            background: #F8FAFC;
-            border: 1.5px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 15px 16px;
-            color: var(--text-main);
-            font-size: 15px;
-            outline: none;
-            margin-bottom: 16px;
-            transition: 0.2s;
-        }
-        .food-input:focus {
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 15px rgba(255, 71, 87, 0.15);
-        }
-
+        /* دکمه اصلی جستجو */
         .search-btn {
             width: 100%;
             background: var(--primary-gradient);
-            color: white;
+            color: #FFFFFF;
             border: none;
-            border-radius: 16px;
-            padding: 16px;
-            font-size: 16px;
+            border-radius: var(--radius-lg);
+            padding: 15px 18px;
+            font-size: 15px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
-            transition: 0.2s;
+            box-shadow: 0 10px 25px -5px rgba(255, 71, 87, 0.45);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+        .search-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+        .search-btn:active { transform: scale(0.985); }
         .search-btn.snapp-btn {
-            background: linear-gradient(135deg, #FA0050 0%, #FF3366 100%);
-            box-shadow: 0 10px 25px rgba(250, 0, 80, 0.3);
+            background: var(--snapp-gradient);
+            box-shadow: 0 10px 25px -5px rgba(250, 0, 80, 0.4);
         }
-        .search-btn:active { transform: scale(0.98); }
 
-        #resultsWrapper {
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #FFFFFF;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        .search-btn.loading .spinner { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* کانتینر نتایج */
+        #resultsSection {
             width: 100%;
-            margin-top: 25px;
+            margin-top: 22px;
+        }
+        .results-header-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+        .results-header-bar.visible { display: flex; }
+        .results-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .results-hint {
+            font-size: 11.5px;
+            color: var(--text-muted);
         }
 
-        /* فوتر شیک و مینیمال با لوگوی کوچک */
+        .empty-state {
+            text-align: center;
+            padding: 32px 20px;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px dashed #CBD5E1;
+            border-radius: var(--radius-xl);
+            color: var(--text-muted);
+        }
+        .empty-state-icon {
+            font-size: 34px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .empty-state p {
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* فوتر */
         .site-footer {
-            margin-top: 50px;
-            padding: 25px 10px;
+            margin-top: 44px;
+            padding: 20px 10px 10px 10px;
             text-align: center;
             border-top: 1px solid #E2E8F0;
             display: flex;
@@ -320,127 +625,198 @@ HTML_TEMPLATE = """
             gap: 8px;
         }
         .footer-logo {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             object-fit: cover;
-            border-radius: 14px;
+            border-radius: 12px;
             opacity: 0.9;
         }
         .footer-text {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text-muted);
             font-weight: 500;
         }
 
-        /* استایل‌های گوگل و مخفی‌سازی اضافات */
-        .gsc-search-box, .gsc-tabsArea, .gcse-search-box, .gsc-resultsHeader, .gsc-adBlock, .gsc-results-close-btn, .gsc-modal-background-image {
+        /* استایل‌های مدرن نتایج گوگل و مخفی‌سازی اضافات */
+        .gsc-search-box, .gsc-tabsArea, .gcse-search-box, .gsc-resultsHeader,
+        .gsc-adBlock, .gsc-results-close-btn, .gsc-modal-background-image,
+        .gcsc-find-more-on-google, .gcsc-find-more-on-google-root {
             display: none !important;
         }
-        .gcsc-branding, .gcsc-branding-text, .gcsc-branding-img, .gcsc-branding-clickable, .gsc-branding, .gsc-branding-text, .gsc-branding-img {
+        .gcsc-branding, .gcsc-branding-text, .gcsc-branding-img,
+        .gcsc-branding-clickable, .gsc-branding, .gsc-branding-text, .gsc-branding-img {
             display: none !important; visibility: hidden !important; height: 0 !important; opacity: 0 !important;
         }
-        .gsc-results-search-on-google, .gsc-results-search-on-google-box, .gsc-results-search-on-google-container, #resultsWrapper a[href*="google.com/search"], #resultsWrapper a[href*="client=ms-google-coop"] {
+        .gsc-results-search-on-google, .gsc-results-search-on-google-box,
+        .gsc-results-search-on-google-container, #resultsWrapper a[href*="google.com/search"],
+        #resultsWrapper a[href*="client=ms-google-coop"] {
             display: none !important; visibility: hidden !important; height: 0 !important; opacity: 0 !important; pointer-events: none !important;
         }
         .gsc-overflow-hidden { overflow: visible !important; position: static !important; }
         .gsc-results-wrapper-overlay, .gsc-results-wrapper-nooverlay {
-            position: static !important; width: 100% !important; height: auto !important; max-height: none !important; overflow: visible !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
+            position: static !important; width: 100% !important; height: auto !important;
+            max-height: none !important; overflow: visible !important; background: transparent !important;
+            border: none !important; box-shadow: none !important; padding: 0 !important;
         }
-        .gsc-control-cse { background: transparent !important; border: none !important; padding: 0 !important; }
-        
+        .gsc-control-cse, .gsc-control-cse * {
+            font-family: 'Vazirmatn', system-ui, sans-serif !important;
+        }
+        .gsc-control-cse {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
         .gsc-webResult.gsc-result {
             background: #FFFFFF !important;
             border: 1px solid #E2E8F0 !important;
             border-radius: 20px !important;
-            padding: 20px !important;
-            margin-bottom: 16px !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-            transition: 0.2s !important;
+            padding: 18px !important;
+            margin-bottom: 14px !important;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
+            transition: all 0.2s ease !important;
         }
         .gsc-webResult.gsc-result:hover {
             border-color: var(--primary) !important;
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08) !important;
         }
 
         .gs-title, .gs-title * {
             color: #E11D48 !important;
-            font-size: 17px !important;
+            font-size: 16px !important;
             font-weight: 800 !important;
             text-decoration: none !important;
-            line-height: 1.5 !important;
+            line-height: 1.6 !important;
         }
         .gs-snippet {
             color: #475569 !important;
-            font-size: 14px !important;
-            line-height: 1.7 !important;
-            margin-top: 10px !important;
+            font-size: 13.5px !important;
+            line-height: 1.8 !important;
+            margin-top: 8px !important;
         }
         .gsc-url-top { padding: 0 !important; }
         .gs-visibleUrl {
             color: #059669 !important;
             font-size: 12px !important;
-            font-weight: bold !important;
+            font-weight: 700 !important;
             margin-top: 6px !important;
             display: inline-block !important;
+            direction: ltr;
+        }
+        .gs-image-box {
+            border-radius: 12px !important;
+            overflow: hidden !important;
         }
 
-        .gsc-cursor-box { margin: 35px 0 15px 0 !important; text-align: center !important; }
+        .gsc-cursor-box { margin: 28px 0 10px 0 !important; text-align: center !important; }
         .gsc-cursor-page {
-            background: white !important;
+            background: #FFFFFF !important;
             border: 1px solid #CBD5E1 !important;
             color: #334155 !important;
-            padding: 10px 16px !important;
+            padding: 8px 14px !important;
             border-radius: 12px !important;
-            margin: 0 5px !important;
-            font-size: 14px !important;
-            font-weight: bold !important;
+            margin: 0 4px !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
             display: inline-block !important;
+            text-decoration: none !important;
         }
         .gsc-cursor-current-page {
             background: var(--primary) !important;
-            color: white !important;
+            color: #FFFFFF !important;
             border-color: var(--primary) !important;
+        }
+
+        @media (max-width: 480px) {
+            .search-panel { padding: 16px; border-radius: 22px; }
+            .main-logo { width: 58px; height: 58px; border-radius: 16px; }
+            .brand-title { font-size: 20px; }
+            .mode-btn { font-size: 12.5px; padding: 10px 8px; }
         }
     </style>
 </head>
 <body>
+    <div id="toast" class="toast"></div>
+
     <div class="container">
-        <!-- هدر با لوگوی بزرگ و شیک -->
-        <div class="header">
-            <img src="/logo.png" alt="فود یاب" class="main-logo">
-            <p class="subtitle">راهنمای هوشمند کافه، رستوران و سفارش آنلاین</p>
-        </div>
+        <!-- هدر جمع‌وجور و به‌روز -->
+        <header class="header">
+            <div class="logo-wrapper">
+                <img src="/logo.png" alt="فود یاب" class="main-logo" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <div class="brand-row">
+                    <h1 class="brand-title">فود یاب</h1>
+                    <span class="brand-badge">نسخه هوشمند</span>
+                </div>
+                <p class="subtitle">جستجوی سریع کافه، رستوران و بررسی فودبلاگرها</p>
+            </div>
+        </header>
 
+        <!-- انتخاب منبع جستجو -->
         <div class="mode-switch">
-            <div class="mode-btn active" id="btn-insta" onclick="switchMode('insta')">
-                <span>📸 اینستاگرام (فودبلاگرها)</span>
-            </div>
-            <div class="mode-btn" id="btn-snapp" onclick="switchMode('snapp')">
-                <span>🛵 اسنپ‌فود</span>
-            </div>
+            <button type="button" class="mode-btn active insta" id="btn-insta" onclick="switchMode('insta')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <span>اینستاگرام (فودبلاگرها)</span>
+            </button>
+            <button type="button" class="mode-btn" id="btn-snapp" onclick="switchMode('snapp')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span>اسنپ‌فود</span>
+            </button>
         </div>
 
-        <div class="search-panel">
-            <div id="insta-fields">
-                <span class="section-title">
-                    <span>➕ افزودن فودبلاگر جدید:</span>
-                    <button class="toggle-presets-btn" onclick="togglePresets()">🌟 بلاگرهای معروف</button>
+        <!-- کارت جستجو -->
+        <main class="search-panel">
+            <!-- بخش ۱: کادر جستجوی غذا (در بالاترین اولویت) -->
+            <div class="food-search-box">
+                <span class="search-icon-right">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </span>
-                
-                <div class="presets-container" id="presetsContainer">
-                    <!-- لیست 15 تایی پیش فرض اینجا لود میشود -->
+                <input type="text" class="food-input" id="food" placeholder="اسم غذا یا کافه چی باشه؟ (مثلاً پیتزا، شاورما، کباب...)" oninput="toggleClearBtn()" onkeypress="handleKeyPress(event)">
+                <button type="button" class="clear-input-btn" id="clearFoodBtn" onclick="clearFoodInput()" title="پاک کردن">×</button>
+            </div>
+
+            <!-- پیشنهادهای سریع -->
+            <div class="quick-foods">
+                <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600; flex-shrink: 0;">سریع:</span>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('پیتزا')">🍕 پیتزا</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('برگر')">🍔 برگر</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('کباب')">🍢 کباب</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('پاستا')">🍝 پاستا</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('شاورما')">🌯 شاورما</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('کافه')">☕ کافه</button>
+                <button type="button" class="quick-food-tag" onclick="quickSearchFood('صبحانه')">🍳 صبحانه</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- بخش ۲: فیلترهای اینستاگرام -->
+            <div id="insta-fields">
+                <div class="section-header">
+                    <span class="section-title">
+                        <span>🎯 فودبلاگرهای انتخابی</span>
+                        <span class="count-badge" id="selectedCountBadge">۰ فعال</span>
+                    </span>
+                    <div class="mini-actions">
+                        <button type="button" class="text-btn" onclick="selectAllPages()">انتخاب همه</button>
+                        <button type="button" class="text-btn" onclick="clearAllPages()">هیچ‌کدام</button>
+                        <button type="button" class="toggle-presets-btn" onclick="togglePresets()">🌟 بلاگرهای معروف</button>
+                    </div>
                 </div>
 
-                <div class="add-box">
-                    <input type="text" id="newPage" placeholder="مانند : dina_taster">
-                    <button class="add-btn" onclick="addNewPage()">افزودن</button>
-                </div>
+                <div class="presets-container" id="presetsContainer"></div>
 
-                <span class="section-title">🎯 فودبلاگرهای من (قابل انتخاب و ویرایش):</span>
                 <div class="pages-list" id="pagesContainer"></div>
 
-                <span class="section-title">📅 بازه زمانی انتشار:</span>
+                <div class="add-box">
+                    <input type="text" id="newPage" placeholder="افزودن آیدی فودبلاگر (مثلاً: dina_taster)" onkeypress="if(event.key==='Enter') addNewPage()">
+                    <button type="button" class="add-btn" onclick="addNewPage()">+ افزودن</button>
+                </div>
+
+                <div class="section-header" style="margin-bottom: 8px;">
+                    <span class="section-title">📅 بازه زمانی پست‌ها:</span>
+                </div>
                 <div class="time-filter">
                     <div class="time-btn" id="time-m" onclick="setTime('m')">۱ ماه اخیر</div>
                     <div class="time-btn active" id="time-y" onclick="setTime('y')">۱ سال اخیر</div>
@@ -448,8 +824,11 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
+            <!-- بخش ۲ جایگزین: فیلترهای اسنپ‌فود -->
             <div id="snapp-fields" style="display: none;">
-                <span class="section-title">📍 انتخاب شهر شما:</span>
+                <div class="section-header">
+                    <span class="section-title">📍 انتخاب شهر:</span>
+                </div>
                 <div class="city-chips">
                     <div class="city-chip active" onclick="setCity(this, 'شیراز')">شیراز</div>
                     <div class="city-chip" onclick="setCity(this, 'تهران')">تهران</div>
@@ -458,23 +837,37 @@ HTML_TEMPLATE = """
                     <div class="city-chip" onclick="setCity(this, 'تبریز')">تبریز</div>
                 </div>
                 <div class="add-box" style="margin-bottom: 18px;">
-                    <input type="text" id="customCity" placeholder="یا نام شهر دیگر را تایپ کنید...">
+                    <input type="text" id="customCity" placeholder="یا نام شهر دیگری را بنویسید..." oninput="onCustomCityInput()" onkeypress="handleKeyPress(event)">
                 </div>
             </div>
 
-            <span class="section-title">🍲 نام غذا یا دسر مورد نظر:</span>
-            <input type="text" class="food-input" id="food" placeholder="مثال: شاورما، پیتزا، کباب کوبیده، پاستا..." onkeypress="handleKeyPress(event)">
+            <!-- دکمه اصلی -->
+            <button type="button" class="search-btn" id="mainSearchBtn" onclick="executeSmartSearch()">
+                <span class="spinner"></span>
+                <span id="searchBtnText">🔍 جستجو در پست‌های فودبلاگرها</span>
+            </button>
+        </main>
 
-            <button class="search-btn" id="mainSearchBtn" onclick="executeSmartSearch()">🔍 جستجوی هوشمند در پست‌های اینستاگرام</button>
-        </div>
+        <!-- نتایج جستجو -->
+        <section id="resultsSection">
+            <div class="results-header-bar" id="resultsHeaderBar">
+                <span class="results-label">✨ نتایج یافت‌شده</span>
+                <span class="results-hint">برای باز شدن در تب جدید روی عنوان بزنید</span>
+            </div>
 
-        <div id="resultsWrapper">
-            <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
-        </div>
+            <div class="empty-state" id="emptyState">
+                <span class="empty-state-icon">🍽️</span>
+                <p>نام غذای مورد نظرتان را بنویسید تا بهترین بررسی‌های فودبلاگرها یا رستوران‌های اسنپ‌فود برایتان نمایش داده شود.</p>
+            </div>
 
-        <!-- فوتر مینیمال با لوگوی کوچک -->
+            <div id="resultsWrapper">
+                <div class="gcse-searchresults-only" data-gname="foodyab_results" data-linktarget="_blank"></div>
+            </div>
+        </section>
+
+        <!-- فوتر -->
         <footer class="site-footer">
-            <img src="/logo.png" alt="فود یاب" class="footer-logo">
+            <img src="/logo.png" alt="فود یاب" class="footer-logo" onerror="this.style.display='none'">
             <p class="footer-text">فود یاب | دستیار هوشمند کافه‌رستوران‌گردی</p>
         </footer>
     </div>
@@ -482,17 +875,32 @@ HTML_TEMPLATE = """
 <script>
     let currentMode = 'insta';
     let selectedCity = 'شیراز';
-    let savedPages = JSON.parse(localStorage.getItem('my_food_pages')) || ['mr.mrs_shekamoo'];
+
+    // پاکسازی آرایه ذخیره‌شده از مقادیر خالی احتمالی
+    let rawSaved = JSON.parse(localStorage.getItem('my_food_pages')) || ['mr.mrs_shekamoo'];
+    let savedPages = rawSaved.map(p => (p || '').trim()).filter(Boolean);
+    if (savedPages.length === 0) savedPages = ['mr.mrs_shekamoo'];
+
     let selectedPages = new Set(savedPages);
     let selectedTime = 'y';
 
-    // لیست 15 تایی پیش فرض قابل ادیت توسط شما
+    // لیست بلاگرهای معروف (آیدی‌های جدید را می‌توانید داخل این آرایه اضافه کنید)
     const defaultBloggers = [
-        'mr.mrs_shekamoo', 'amin.nilson', 'khas_foood', 'shirazyummy', 
+        'mr.mrs_shekamoo', 'amin.nilson', 'khas_foood', 'shirazyummy',
         'sadegh.delicious', 'missfoodshiraz', 'ali_food_report', 'mr.foodshz',
-        'afshin.lashkari', '', '', '',
-        '', '', ''
-    ];
+        'afshin.lashkari'
+    ].map(p => p.trim()).filter(Boolean);
+
+    let toastTimer;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2800);
+    }
 
     function switchMode(mode) {
         currentMode = mode;
@@ -501,22 +909,45 @@ HTML_TEMPLATE = """
         const instaFields = document.getElementById('insta-fields');
         const snappFields = document.getElementById('snapp-fields');
         const searchBtn = document.getElementById('mainSearchBtn');
+        const searchBtnText = document.getElementById('searchBtnText');
 
         if (mode === 'insta') {
-            btnInsta.className = 'mode-btn active';
+            document.body.classList.remove('snapp-mode');
+            btnInsta.className = 'mode-btn active insta';
             btnSnapp.className = 'mode-btn';
             instaFields.style.display = 'block';
             snappFields.style.display = 'none';
             searchBtn.className = 'search-btn';
-            searchBtn.innerText = '🔍 جستجوی هوشمند در پست‌های اینستاگرام';
+            searchBtnText.innerText = '🔍 جستجو در پست‌های فودبلاگرها';
         } else {
+            document.body.classList.add('snapp-mode');
             btnInsta.className = 'mode-btn';
             btnSnapp.className = 'mode-btn active snapp';
             instaFields.style.display = 'none';
             snappFields.style.display = 'block';
             searchBtn.className = 'search-btn snapp-btn';
-            searchBtn.innerText = '🛵 جستجو در رستوران‌ها و منوهای اسنپ‌فود';
+            searchBtnText.innerText = '🛵 جستجو در رستوران‌ها و منوهای اسنپ‌فود';
         }
+    }
+
+    function toggleClearBtn() {
+        const input = document.getElementById('food');
+        const btn = document.getElementById('clearFoodBtn');
+        btn.classList.toggle('visible', input.value.length > 0);
+    }
+
+    function clearFoodInput() {
+        const input = document.getElementById('food');
+        input.value = '';
+        toggleClearBtn();
+        input.focus();
+    }
+
+    function quickSearchFood(foodName) {
+        const input = document.getElementById('food');
+        input.value = foodName;
+        toggleClearBtn();
+        executeSmartSearch();
     }
 
     function setCity(el, city) {
@@ -526,55 +957,75 @@ HTML_TEMPLATE = """
         document.getElementById('customCity').value = '';
     }
 
-    // رندر کردن بلاگرهای ذخیره شده کاربر
+    function onCustomCityInput() {
+        const val = document.getElementById('customCity').value.trim();
+        if (val) {
+            document.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
+        }
+    }
+
+    function updateSelectedBadge() {
+        const badge = document.getElementById('selectedCountBadge');
+        badge.textContent = `${selectedPages.size.toLocaleString('fa-IR')} فعال`;
+    }
+
     function renderChips() {
         const container = document.getElementById('pagesContainer');
         container.innerHTML = '';
+
         savedPages.forEach(page => {
             const isSelected = selectedPages.has(page);
             const chip = document.createElement('div');
             chip.className = `chip ${isSelected ? 'active' : ''}`;
-            chip.innerHTML = `
-                <span onclick="toggleSelect('${page}')">${page} ${isSelected ? '✓' : ''}</span>
-                <span class="del-btn" onclick="deletePage(event, '${page}')">×</span>
-            `;
+
+            const label = document.createElement('span');
+            label.textContent = isSelected ? `${page} ✓` : page;
+            chip.onclick = () => toggleSelect(page);
+
+            const delBtn = document.createElement('span');
+            delBtn.className = 'del-btn';
+            delBtn.textContent = '×';
+            delBtn.title = 'حذف';
+            delBtn.onclick = (e) => deletePage(e, page);
+
+            chip.appendChild(label);
+            chip.appendChild(delBtn);
             container.appendChild(chip);
         });
+
         localStorage.setItem('my_food_pages', JSON.stringify(savedPages));
-        renderPresets(); // آپدیت لیست پیش فرض (برای مخفی کردن مواردی که اضافه شده اند)
+        updateSelectedBadge();
+        renderPresets();
     }
 
-    // رندر کردن لیست 15 تایی پیش فرض
     function renderPresets() {
         const container = document.getElementById('presetsContainer');
         container.innerHTML = '';
-        
+
         let hasAvailablePresets = false;
         defaultBloggers.forEach(page => {
-            // اگر در لیست فعلی کاربر نیست، نمایشش بده
             if (!savedPages.includes(page)) {
                 hasAvailablePresets = true;
-                const chip = document.createElement('div');
+                const chip = document.createElement('button');
+                chip.type = 'button';
                 chip.className = 'preset-chip';
-                chip.innerHTML = `+ ${page}`;
+                chip.textContent = `+ ${page}`;
                 chip.onclick = () => addPageDirectly(page);
                 container.appendChild(chip);
             }
         });
 
         if (!hasAvailablePresets) {
-            container.innerHTML = '<span style="font-size:12px; color:gray;">همه بلاگرهای معروف به لیست شما اضافه شده‌اند!</span>';
+            const msg = document.createElement('span');
+            msg.style.cssText = 'font-size:12px; color:#64748B; font-weight:500;';
+            msg.textContent = 'همه بلاگرهای معروف به لیست شما اضافه شده‌اند!';
+            container.appendChild(msg);
         }
     }
 
-    // باز و بسته کردن پنل پیش فرض ها
     function togglePresets() {
         const container = document.getElementById('presetsContainer');
-        if (container.style.display === 'flex') {
-            container.style.display = 'none';
-        } else {
-            container.style.display = 'flex';
-        }
+        container.style.display = (container.style.display === 'flex') ? 'none' : 'flex';
     }
 
     function toggleSelect(page) {
@@ -583,17 +1034,41 @@ HTML_TEMPLATE = """
         renderChips();
     }
 
+    function selectAllPages() {
+        savedPages.forEach(p => selectedPages.add(p));
+        renderChips();
+    }
+
+    function clearAllPages() {
+        selectedPages.clear();
+        renderChips();
+    }
+
     function addPageDirectly(val) {
-        if (val && !savedPages.includes(val)) {
-            savedPages.push(val);
-            selectedPages.add(val);
+        const cleaned = (val || '').trim().replace(/^@+/, '');
+        if (!cleaned) return;
+
+        if (savedPages.includes(cleaned)) {
+            selectedPages.add(cleaned);
             renderChips();
+            showToast(`پیج ${cleaned} از قبل در لیست شما بود و انتخاب شد.`);
+            return;
         }
+
+        savedPages.push(cleaned);
+        selectedPages.add(cleaned);
+        renderChips();
+        showToast(`پیج ${cleaned} اضافه شد ✓`);
     }
 
     function addNewPage() {
         const input = document.getElementById('newPage');
-        const val = input.value.trim().replace('@', '');
+        const val = input.value.trim().replace(/^@+/, '');
+        if (!val) {
+            showToast('لطفاً آیدی اینستاگرام بلاگر را وارد کنید.');
+            input.focus();
+            return;
+        }
         addPageDirectly(val);
         input.value = '';
     }
@@ -637,14 +1112,15 @@ HTML_TEMPLATE = """
                 el.remove();
             });
 
-            if (attempts > 30) clearInterval(interval);
+            if (attempts > 35) clearInterval(interval);
         }, 100);
     }
 
     function executeSmartSearch() {
         const food = document.getElementById('food').value.trim();
         if (!food) {
-            alert('لطفاً نام غذا را بنویسید!');
+            showToast('لطفاً ابتدا نام غذا یا رستوران را بنویسید!');
+            document.getElementById('food').focus();
             return;
         }
 
@@ -652,20 +1128,22 @@ HTML_TEMPLATE = """
 
         if (currentMode === 'insta') {
             if (selectedPages.size === 0) {
-                alert('لطفاً حداقل یک پیج فودبلاگر را انتخاب کنید!');
+                showToast('لطفاً حداقل یک فودبلاگر را انتخاب کنید!');
                 return;
             }
             const pagesArray = Array.from(selectedPages);
-            const pagesQuery = pagesArray.length === 1 ? `"${pagesArray[0]}"` : '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
+            const pagesQuery = pagesArray.length === 1
+                ? `"${pagesArray[0]}"`
+                : '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
 
             let dateFilter = '';
             const now = new Date();
             if (selectedTime === 'm') {
                 const d = new Date(new Date().setDate(now.getDate() - 30));
-                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             } else if (selectedTime === 'y') {
                 const d = new Date(new Date().setFullYear(now.getFullYear() - 1));
-                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                dateFilter = `after:${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             }
 
             finalQuery = `site:instagram.com ${pagesQuery} ${food} ${dateFilter}`.trim();
@@ -675,21 +1153,33 @@ HTML_TEMPLATE = """
             finalQuery = `site:snappfood.ir "${city}" ${food}`.trim();
         }
 
+        if (typeof google === 'undefined' || !google.search || !google.search.cse) {
+            showToast('موتور جستجو در حال بارگذاری است، یک لحظه صبر کنید...');
+            return;
+        }
+
         const element = google.search.cse.element.getElement('foodyab_results');
         if (element) {
+            const btn = document.getElementById('mainSearchBtn');
+            btn.classList.add('loading');
+
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsHeaderBar').classList.add('visible');
+
             element.execute(finalQuery);
             unlockGoogleScrollTrap();
 
             setTimeout(() => {
-                const resultsEl = document.getElementById('resultsWrapper');
+                btn.classList.remove('loading');
+                const resultsEl = document.getElementById('resultsSection');
                 if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 600);
+            }, 650);
         } else {
-            alert('در حال بارگذاری موتور جستجو... لطفاً دوباره دکمه را بزنید.');
+            showToast('در حال آماده‌سازی جستجو... لطفاً دوباره کلیک کنید.');
         }
     }
 
-    renderChips(); // لود اولیه
+    renderChips();
 </script>
 </body>
 </html>
