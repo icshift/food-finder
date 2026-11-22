@@ -107,7 +107,7 @@ HTML_TEMPLATE = """
             opacity: 1;
         }
 
-        /* هدر جمع‌وجور و مدرن */
+        /* هدر */
         .header {
             display: flex;
             align-items: center;
@@ -212,7 +212,7 @@ HTML_TEMPLATE = """
             margin-bottom: 22px;
         }
 
-        /* باکس اصلی جستجوی غذا (در اولویت بالا) */
+        /* باکس اصلی جستجوی غذا */
         .food-search-box {
             position: relative;
             margin-bottom: 10px;
@@ -277,7 +277,7 @@ HTML_TEMPLATE = """
             gap: 6px;
             overflow-x: auto;
             padding-bottom: 4px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             scrollbar-width: none;
         }
         .quick-foods::-webkit-scrollbar { display: none; }
@@ -322,87 +322,168 @@ HTML_TEMPLATE = """
             gap: 6px;
         }
         .count-badge {
-            background: #F1F5F9;
-            color: var(--text-secondary);
+            background: var(--primary-soft);
+            color: var(--primary);
             font-size: 11px;
-            padding: 2px 8px;
+            padding: 2px 9px;
             border-radius: 99px;
             font-weight: 700;
         }
         .mini-actions {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .text-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            color: var(--text-secondary);
             font-size: 11.5px;
             font-weight: 600;
             cursor: pointer;
-            padding: 4px 7px;
+            padding: 4px 9px;
             border-radius: 8px;
             transition: 0.2s;
         }
-        .text-btn:hover { background: #F1F5F9; color: var(--primary); }
-
-        .toggle-presets-btn {
-            background: #FFF7ED;
-            border: 1px solid #FFEDD5;
-            color: #EA580C;
-            padding: 5px 11px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .toggle-presets-btn:hover {
-            background: #FFEDD5;
+        .text-btn:hover {
+            background: #F1F5F9;
+            color: var(--primary);
+            border-color: rgba(255, 71, 87, 0.3);
         }
 
-        /* پنل بلاگرهای معروف */
-        .presets-container {
+        /* دکمه آکاردئونی لیست بلاگرهای معروف */
+        .presets-toggle-bar {
+            width: 100%;
             background: #F8FAFC;
-            border: 1px dashed #CBD5E1;
-            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            padding: 11px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+        .presets-toggle-bar:hover {
+            border-color: #CBD5E1;
+            background: #F1F5F9;
+        }
+        .presets-toggle-bar.open {
+            border-color: rgba(225, 48, 108, 0.35);
+            background: #FFF5F7;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            margin-bottom: 0;
+        }
+        .presets-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .presets-toggle-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .presets-subcount {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            padding: 2px 8px;
+            border-radius: 99px;
+        }
+        .chevron-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            transition: transform 0.25s ease;
+        }
+        .presets-toggle-bar.open .chevron-icon {
+            transform: rotate(180deg);
+            color: #E1306C;
+        }
+
+        /* پنل کشویی بلاگرهای معروف (انتخاب درجا بدون جابه‌جایی) */
+        .presets-container {
+            background: #FFF9FA;
+            border: 1.5px solid rgba(225, 48, 108, 0.25);
+            border-top: none;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
             padding: 12px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: none;
-            flex-wrap: wrap;
-            gap: 7px;
+            flex-direction: column;
+            gap: 10px;
             animation: fadeIn 0.2s ease;
+        }
+        .presets-container.open {
+            display: flex;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .presets-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
         .preset-chip {
             background: #FFFFFF;
-            border: 1px solid var(--border-color);
+            border: 1.5px solid #E2E8F0;
             color: var(--text-secondary);
-            padding: 6px 11px;
-            border-radius: 10px;
-            font-size: 12px;
+            padding: 7px 12px;
+            border-radius: 12px;
+            font-size: 12.5px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
-            display: flex;
+            transition: all 0.2s ease;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            user-select: none;
         }
         .preset-chip:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #FFF5F5;
+            border-color: #FDA4AF;
+            color: var(--text-main);
+        }
+        .preset-chip .check-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid #CBD5E1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: 0.2s;
+            background: #F8FAFC;
+            color: transparent;
+        }
+        .preset-chip.active {
+            background: var(--insta-gradient);
+            border-color: transparent;
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.26);
+        }
+        .preset-chip.active .check-dot {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: transparent;
+            color: #FFFFFF;
         }
 
-        /* افزودن بلاگر / شهر */
+        /* افزودن بلاگر دلخواه */
         .add-box {
             display: flex;
             gap: 8px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .add-box input {
             flex: 1;
@@ -434,21 +515,37 @@ HTML_TEMPLATE = """
         }
         .add-btn:hover { background: #1E293B; }
 
-        /* لیست چیپ‌های بلاگرهای انتخابی */
+        /* بخش آیدی‌های دلخواه کاربر (فقط زمانی دیده می‌شود که آیدی دستی اضافه شود) */
+        .custom-pages-wrapper {
+            display: none;
+            margin-bottom: 16px;
+            padding: 10px 12px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+        }
+        .custom-pages-wrapper.visible {
+            display: block;
+        }
+        .custom-pages-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+        }
         .pages-list {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 18px;
-            max-height: 135px;
+            max-height: 120px;
             overflow-y: auto;
-            padding: 2px;
         }
         .chip {
-            background: #F1F5F9;
-            border: 1px solid var(--border-color);
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-color);
             color: var(--text-secondary);
-            padding: 6px 12px;
+            padding: 6px 11px;
             border-radius: 12px;
             font-size: 12.5px;
             font-weight: 600;
@@ -464,7 +561,7 @@ HTML_TEMPLATE = """
             background: var(--insta-gradient);
             color: #FFFFFF;
             border-color: transparent;
-            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.28);
+            box-shadow: 0 4px 12px rgba(225, 48, 108, 0.25);
         }
         .chip .del-btn {
             width: 18px;
@@ -740,7 +837,7 @@ HTML_TEMPLATE = """
     <div id="toast" class="toast"></div>
 
     <div class="container">
-        <!-- هدر جمع‌وجور و به‌روز -->
+        <!-- هدر -->
         <header class="header">
             <div class="logo-wrapper">
                 <img src="/logo.png" alt="فود یاب" class="main-logo" onerror="this.style.display='none'">
@@ -768,7 +865,7 @@ HTML_TEMPLATE = """
 
         <!-- کارت جستجو -->
         <main class="search-panel">
-            <!-- بخش ۱: کادر جستجوی غذا (در بالاترین اولویت) -->
+            <!-- کادر جستجوی غذا -->
             <div class="food-search-box">
                 <span class="search-icon-right">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -791,27 +888,45 @@ HTML_TEMPLATE = """
 
             <div class="divider"></div>
 
-            <!-- بخش ۲: فیلترهای اینستاگرام -->
+            <!-- فیلترهای اینستاگرام -->
             <div id="insta-fields">
                 <div class="section-header">
                     <span class="section-title">
-                        <span>🎯 فودبلاگرهای انتخابی</span>
-                        <span class="count-badge" id="selectedCountBadge">۰ فعال</span>
+                        <span>🎯 فودبلاگرهای جستجو</span>
+                        <span class="count-badge" id="selectedCountBadge">۱ فعال</span>
                     </span>
                     <div class="mini-actions">
                         <button type="button" class="text-btn" onclick="selectAllPages()">انتخاب همه</button>
                         <button type="button" class="text-btn" onclick="clearAllPages()">هیچ‌کدام</button>
-                        <button type="button" class="toggle-presets-btn" onclick="togglePresets()">🌟 بلاگرهای معروف</button>
                     </div>
                 </div>
 
-                <div class="presets-container" id="presetsContainer"></div>
+                <!-- دکمه باز و بسته کردن لیست بلاگرهای معروف -->
+                <button type="button" class="presets-toggle-bar" id="presetsToggleBtn" onclick="togglePresets()">
+                    <span class="presets-toggle-left">
+                        <span>🌟 بلاگرهای معروف</span>
+                    </span>
+                    <span class="presets-toggle-right">
+                        <span class="presets-subcount" id="presetsCountLabel">۱ از ۹ انتخاب‌شده</span>
+                        <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                </button>
 
-                <div class="pages-list" id="pagesContainer"></div>
+                <!-- پنل کشویی بلاگرهای معروف (انتخاب درجا، بدون جابه‌جایی به پایین) -->
+                <div class="presets-container" id="presetsContainer">
+                    <div class="presets-grid" id="presetsGrid"></div>
+                </div>
 
+                <!-- افزودن آیدی دلخواه -->
                 <div class="add-box">
-                    <input type="text" id="newPage" placeholder="افزودن آیدی فودبلاگر (مثلاً: dina_taster)" onkeypress="if(event.key==='Enter') addNewPage()">
+                    <input type="text" id="newPage" placeholder="افزودن آیدی دلخواه (مثلاً: dina_taster)" onkeypress="if(event.key==='Enter') addNewPage()">
                     <button type="button" class="add-btn" onclick="addNewPage()">+ افزودن</button>
+                </div>
+
+                <!-- آیدی‌های دلخواهی که خود کاربر اضافه کرده (در صورت وجود نمایش داده می‌شود) -->
+                <div class="custom-pages-wrapper" id="customPagesWrapper">
+                    <span class="custom-pages-label">📌 آیدی‌های دلخواه شما:</span>
+                    <div class="pages-list" id="pagesContainer"></div>
                 </div>
 
                 <div class="section-header" style="margin-bottom: 8px;">
@@ -824,7 +939,7 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <!-- بخش ۲ جایگزین: فیلترهای اسنپ‌فود -->
+            <!-- فیلترهای اسنپ‌فود -->
             <div id="snapp-fields" style="display: none;">
                 <div class="section-header">
                     <span class="section-title">📍 انتخاب شهر:</span>
@@ -875,21 +990,32 @@ HTML_TEMPLATE = """
 <script>
     let currentMode = 'insta';
     let selectedCity = 'شیراز';
-
-    // پاکسازی آرایه ذخیره‌شده از مقادیر خالی احتمالی
-    let rawSaved = JSON.parse(localStorage.getItem('my_food_pages')) || ['mr.mrs_shekamoo'];
-    let savedPages = rawSaved.map(p => (p || '').trim()).filter(Boolean);
-    if (savedPages.length === 0) savedPages = ['mr.mrs_shekamoo'];
-
-    let selectedPages = new Set(savedPages);
     let selectedTime = 'y';
 
-    // لیست بلاگرهای معروف (آیدی‌های جدید را می‌توانید داخل این آرایه اضافه کنید)
+    // لیست بلاگرهای معروف (ثابت داخل منوی کشویی؛ آیدی‌های جدید را می‌توانید اینجا اضافه کنید)
     const defaultBloggers = [
         'mr.mrs_shekamoo', 'amin.nilson', 'khas_foood', 'shirazyummy',
         'sadegh.delicious', 'missfoodshiraz', 'ali_food_report', 'mr.foodshz',
         'afshin.lashkari'
     ].map(p => p.trim()).filter(Boolean);
+
+    // بازیابی آیدی‌های دلخواه کاربر (جدا از لیست معروف‌ها)
+    let customPages = JSON.parse(localStorage.getItem('my_custom_food_pages') || 'null');
+    if (customPages === null) {
+        // انتقال از نسخه قبلی در صورت وجود، بدون تکراری شدن معروف‌ها
+        const legacyPages = JSON.parse(localStorage.getItem('my_food_pages') || '[]');
+        customPages = legacyPages
+            .map(p => (p || '').trim())
+            .filter(p => p && !defaultBloggers.includes(p));
+    } else {
+        customPages = customPages.map(p => (p || '').trim()).filter(p => p && !defaultBloggers.includes(p));
+    }
+
+    // بازیابی بلاگرهای انتخاب‌شده
+    const savedSelectionRaw = localStorage.getItem('my_selected_food_pages');
+    let selectedPages = savedSelectionRaw !== null
+        ? new Set(JSON.parse(savedSelectionRaw).filter(Boolean))
+        : new Set(['mr.mrs_shekamoo']);
 
     let toastTimer;
     function showToast(msg) {
@@ -900,6 +1026,11 @@ HTML_TEMPLATE = """
         toastTimer = setTimeout(() => {
             toast.classList.remove('show');
         }, 2800);
+    }
+
+    function saveState() {
+        localStorage.setItem('my_custom_food_pages', JSON.stringify(customPages));
+        localStorage.setItem('my_selected_food_pages', JSON.stringify(Array.from(selectedPages)));
     }
 
     function switchMode(mode) {
@@ -964,16 +1095,60 @@ HTML_TEMPLATE = """
         }
     }
 
-    function updateSelectedBadge() {
-        const badge = document.getElementById('selectedCountBadge');
-        badge.textContent = `${selectedPages.size.toLocaleString('fa-IR')} فعال`;
+    function updateCounters() {
+        // تعداد کل انتخاب‌ها (معروف + دلخواه)
+        const allAvailable = new Set([...defaultBloggers, ...customPages]);
+        let totalActive = 0;
+        selectedPages.forEach(p => { if (allAvailable.has(p)) totalActive++; });
+
+        document.getElementById('selectedCountBadge').textContent =
+            `${totalActive.toLocaleString('fa-IR')} فعال`;
+
+        // تعداد انتخاب‌شده از لیست معروف‌ها
+        const presetSelectedCount = defaultBloggers.filter(p => selectedPages.has(p)).length;
+        document.getElementById('presetsCountLabel').textContent =
+            `${presetSelectedCount.toLocaleString('fa-IR')} از ${defaultBloggers.length.toLocaleString('fa-IR')} انتخاب‌شده`;
     }
 
-    function renderChips() {
+    // رندر لیست معروف‌ها داخل همان بخش پنهان (بدون حذف یا انتقال)
+    function renderPresets() {
+        const grid = document.getElementById('presetsGrid');
+        grid.innerHTML = '';
+
+        defaultBloggers.forEach(page => {
+            const isSelected = selectedPages.has(page);
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = `preset-chip ${isSelected ? 'active' : ''}`;
+
+            const dot = document.createElement('span');
+            dot.className = 'check-dot';
+            dot.textContent = '✓';
+
+            const label = document.createElement('span');
+            label.textContent = page;
+
+            chip.appendChild(dot);
+            chip.appendChild(label);
+            chip.onclick = () => toggleSelect(page);
+
+            grid.appendChild(chip);
+        });
+    }
+
+    // رندر آیدی‌های دلخواهی که کاربر خودش اضافه کرده
+    function renderCustomPages() {
+        const wrapper = document.getElementById('customPagesWrapper');
         const container = document.getElementById('pagesContainer');
         container.innerHTML = '';
 
-        savedPages.forEach(page => {
+        if (customPages.length === 0) {
+            wrapper.classList.remove('visible');
+            return;
+        }
+
+        wrapper.classList.add('visible');
+        customPages.forEach(page => {
             const isSelected = selectedPages.has(page);
             const chip = document.createElement('div');
             chip.className = `chip ${isSelected ? 'active' : ''}`;
@@ -986,79 +1161,43 @@ HTML_TEMPLATE = """
             delBtn.className = 'del-btn';
             delBtn.textContent = '×';
             delBtn.title = 'حذف';
-            delBtn.onclick = (e) => deletePage(e, page);
+            delBtn.onclick = (e) => deleteCustomPage(e, page);
 
             chip.appendChild(label);
             chip.appendChild(delBtn);
             container.appendChild(chip);
         });
-
-        localStorage.setItem('my_food_pages', JSON.stringify(savedPages));
-        updateSelectedBadge();
-        renderPresets();
     }
 
-    function renderPresets() {
-        const container = document.getElementById('presetsContainer');
-        container.innerHTML = '';
-
-        let hasAvailablePresets = false;
-        defaultBloggers.forEach(page => {
-            if (!savedPages.includes(page)) {
-                hasAvailablePresets = true;
-                const chip = document.createElement('button');
-                chip.type = 'button';
-                chip.className = 'preset-chip';
-                chip.textContent = `+ ${page}`;
-                chip.onclick = () => addPageDirectly(page);
-                container.appendChild(chip);
-            }
-        });
-
-        if (!hasAvailablePresets) {
-            const msg = document.createElement('span');
-            msg.style.cssText = 'font-size:12px; color:#64748B; font-weight:500;';
-            msg.textContent = 'همه بلاگرهای معروف به لیست شما اضافه شده‌اند!';
-            container.appendChild(msg);
-        }
+    function renderAllBloggers() {
+        renderPresets();
+        renderCustomPages();
+        updateCounters();
+        saveState();
     }
 
     function togglePresets() {
+        const btn = document.getElementById('presetsToggleBtn');
         const container = document.getElementById('presetsContainer');
-        container.style.display = (container.style.display === 'flex') ? 'none' : 'flex';
+        const isOpen = container.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
     }
 
     function toggleSelect(page) {
         if (selectedPages.has(page)) selectedPages.delete(page);
         else selectedPages.add(page);
-        renderChips();
+        renderAllBloggers();
     }
 
     function selectAllPages() {
-        savedPages.forEach(p => selectedPages.add(p));
-        renderChips();
+        defaultBloggers.forEach(p => selectedPages.add(p));
+        customPages.forEach(p => selectedPages.add(p));
+        renderAllBloggers();
     }
 
     function clearAllPages() {
         selectedPages.clear();
-        renderChips();
-    }
-
-    function addPageDirectly(val) {
-        const cleaned = (val || '').trim().replace(/^@+/, '');
-        if (!cleaned) return;
-
-        if (savedPages.includes(cleaned)) {
-            selectedPages.add(cleaned);
-            renderChips();
-            showToast(`پیج ${cleaned} از قبل در لیست شما بود و انتخاب شد.`);
-            return;
-        }
-
-        savedPages.push(cleaned);
-        selectedPages.add(cleaned);
-        renderChips();
-        showToast(`پیج ${cleaned} اضافه شد ✓`);
+        renderAllBloggers();
     }
 
     function addNewPage() {
@@ -1069,15 +1208,36 @@ HTML_TEMPLATE = """
             input.focus();
             return;
         }
-        addPageDirectly(val);
+
+        // اگر آیدی از قبل در لیست معروف‌ها بود، همان‌جا انتخابش کن و دوباره پایین نساز
+        if (defaultBloggers.includes(val)) {
+            selectedPages.add(val);
+            renderAllBloggers();
+            input.value = '';
+            showToast(`آیدی ${val} در لیست بلاگرهای معروف انتخاب شد ✓`);
+            return;
+        }
+
+        if (customPages.includes(val)) {
+            selectedPages.add(val);
+            renderAllBloggers();
+            input.value = '';
+            showToast(`آیدی ${val} از قبل اضافه شده بود و انتخاب شد.`);
+            return;
+        }
+
+        customPages.push(val);
+        selectedPages.add(val);
+        renderAllBloggers();
         input.value = '';
+        showToast(`آیدی ${val} اضافه و انتخاب شد ✓`);
     }
 
-    function deletePage(event, page) {
+    function deleteCustomPage(event, page) {
         event.stopPropagation();
-        savedPages = savedPages.filter(p => p !== page);
+        customPages = customPages.filter(p => p !== page);
         selectedPages.delete(page);
-        renderChips();
+        renderAllBloggers();
     }
 
     function setTime(timeType) {
@@ -1127,11 +1287,14 @@ HTML_TEMPLATE = """
         let finalQuery = '';
 
         if (currentMode === 'insta') {
-            if (selectedPages.size === 0) {
+            const validPool = new Set([...defaultBloggers, ...customPages]);
+            const pagesArray = Array.from(selectedPages).filter(p => validPool.has(p));
+
+            if (pagesArray.length === 0) {
                 showToast('لطفاً حداقل یک فودبلاگر را انتخاب کنید!');
                 return;
             }
-            const pagesArray = Array.from(selectedPages);
+
             const pagesQuery = pagesArray.length === 1
                 ? `"${pagesArray[0]}"`
                 : '(' + pagesArray.map(p => `"${p}"`).join(' OR ') + ')';
@@ -1179,7 +1342,7 @@ HTML_TEMPLATE = """
         }
     }
 
-    renderChips();
+    renderAllBloggers();
 </script>
 </body>
 </html>
